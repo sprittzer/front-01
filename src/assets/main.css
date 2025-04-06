@@ -1,0 +1,39 @@
+/* src/assets/main-content.css */
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    overflow: hidden;
+    background-color: #F3F3EE;
+  }
+  
+  .main-content {
+    padding: 15px 20px;
+    margin-left: 180px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 12px;
+    background-color: #FCFCF9;
+    overflow-y: auto;
+    scrollbar-width: none;
+    height: calc(100vh - 20px);
+    margin: 10px 10px 10px 185px;
+    position: relative;
+  }
+  
+  .main-content::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .sidebar-collapsed ~ .main-content {
+    margin-left: 90px;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .main-content > * {
+    animation: fadeIn 0.4s ease-out forwards;
+  }
