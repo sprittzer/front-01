@@ -5,7 +5,7 @@ const API_URL = 'https://quartzcrystal.pythonanywhere.com';
 // Создаем экземпляр Axios
 const api = axios.create({
   baseURL: API_URL,
-  withCredentials: true,  // Важно для работы с cookies
+  withCredentials: true,
 });
 
 // Функция для извлечения CSRF-токена из cookies
@@ -26,20 +26,20 @@ api.interceptors.request.use(config => {
 });
 
 // Инициализация CSRF
-async function initializeCSRF() {
+export async function initializeCSRF() {
   try {
-    // Делаем GET-запрос для установки CSRF cookie
-    await api.get('/csrf-endpoint/');  // Может быть любой публичный endpoint
+    await api.get('/');  // Используем корневой endpoint вместо /csrf-endpoint/
     console.log('CSRF токен инициализирован');
+    return true;
   } catch (error) {
     console.error('Ошибка инициализации CSRF:', error);
+    throw error;
   }
 }
 
 // Функция входа
 export async function login(username, password) {
   try {
-    // Убедимся, что CSRF-токен получен
     if (!getCSRFToken()) {
       await initializeCSRF();
     }
@@ -49,25 +49,19 @@ export async function login(username, password) {
       password
     });
 
-    return response.data.token;
+    return response.data;
   } catch (error) {
     console.error('Ошибка входа:', error.response?.data || error.message);
     throw error.response?.data || { error: 'Ошибка входа' };
   }
 }
 
-// Пример использования
-async function authExample() {
-  await initializeCSRF();  // Инициализируем CSRF при загрузке приложения
-  
+// Функция выхода
+export async function logout() {
   try {
-    const token = await login('admin', 'admin');
-    console.log('Токен авторизации:', token);
-    localStorage.setItem('authToken', token);
+    await api.post('/logout/');
   } catch (error) {
-    console.error('Ошибка аутентификации:', error);
+    console.error('Ошибка выхода:', error);
+    throw error;
   }
 }
-
-// Вызываем при загрузке приложения
-authExample();
