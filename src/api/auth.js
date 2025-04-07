@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8000'; // или адрес твоего бэкенда
+const API_URL = 'https://quartzcrystal.pythonanywhere.com'; // адрес бэкенда
 
 export async function login(username, password) {
   try {
