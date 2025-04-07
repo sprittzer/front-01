@@ -6,8 +6,7 @@ export const useAuthStore = defineStore('auth', {
     token: localStorage.getItem('authToken') || null,
     username: localStorage.getItem('username') || null,
     isLoading: false,
-    error: null,
-    csrfInitialized: false
+    error: null
   }),
 
   getters: {
@@ -15,23 +14,13 @@ export const useAuthStore = defineStore('auth', {
   },
 
   actions: {
-    async initialize() {
-      if (!this.csrfInitialized) {
-        try {
-          await initializeCSRF();
-          this.csrfInitialized = true;
-        } catch (error) {
-          console.error('CSRF initialization failed:', error);
-        }
-      }
-    },
-
     async loginUser(username, password) {
       this.isLoading = true;
       this.error = null;
 
       try {
-        await this.initialize(); // Убедимся, что CSRF инициализирован
+        // Инициализируем CSRF перед входом
+        await initializeCSRF();
         
         const data = await login(username, password);
         this.token = data.token;
@@ -42,7 +31,7 @@ export const useAuthStore = defineStore('auth', {
         
         return true;
       } catch (error) {
-        this.error = error.response?.data?.error || error.message || 'Login failed';
+        this.error = error.message || 'Ошибка входа';
         this.clearAuthData();
         throw error;
       } finally {
@@ -55,6 +44,8 @@ export const useAuthStore = defineStore('auth', {
         if (this.token) {
           await logout();
         }
+      } catch (error) {
+        console.error('Ошибка при выходе:', error);
       } finally {
         this.clearAuthData();
       }
