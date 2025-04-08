@@ -8,42 +8,16 @@ const api = axios.create({
   withCredentials: true,
 });
 
-// Функция для извлечения CSRF-токена из cookies
-function getCSRFToken() {
-  const cookieValue = document.cookie
-    .split('; ')
-    .find(row => row.startsWith('csrftoken='))
-    ?.split('=')[1];
-  return cookieValue;
-}
-
-// Интерцептор для автоматической подстановки CSRF-токена
 api.interceptors.request.use(config => {
   if (['post', 'put', 'patch', 'delete'].includes(config.method?.toLowerCase())) {
-    config.headers['X-CSRFToken'] = getCSRFToken();
+    config.headers['X-CSRFToken'] = 'zTQ9ubZqezwPXR2QjDSK5gZGch4S1RFx';
   }
   return config;
 });
 
-// Инициализация CSRF
-export async function initializeCSRF() {
-  try {
-    await api.get('/');  // Используем корневой endpoint вместо /csrf-endpoint/
-    console.log('CSRF токен инициализирован');
-    return true;
-  } catch (error) {
-    console.error('Ошибка инициализации CSRF:', error);
-    throw error;
-  }
-}
-
 // Функция входа
 export async function login(username, password) {
   try {
-    if (!getCSRFToken()) {
-      await initializeCSRF();
-    }
-
     const response = await api.post('/login/', {
       username,
       password
