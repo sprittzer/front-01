@@ -19,8 +19,6 @@ export const useAuthStore = defineStore('auth', {
       this.error = null;
 
       try {
-        // Инициализируем CSRF перед входом
-        await initializeCSRF();
         
         const data = await login(username, password);
         this.token = data.token;
