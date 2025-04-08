@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { login, logout, initializeCSRF } from '../api/auth';
+import { login, logout } from '../api/auth';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
