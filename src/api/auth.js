@@ -5,6 +5,7 @@ const API_URL = 'https://quartzcrystal.pythonanywhere.com';
 // Создаем экземпляр Axios
 const api = axios.create({
   baseURL: API_URL,
+  withCredentials: true,
   headers: {
     'Accept': 'application/json',
     'Content-Type': 'application/json',
