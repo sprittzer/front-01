@@ -104,6 +104,7 @@ const sidebarItems = [
     padding: 0 15px 20px;
     margin-bottom: 10px;
     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .sidebar-collapsed .logout-section {
@@ -118,8 +119,9 @@ const sidebarItems = [
     padding: 12px 15px;
     border-radius: 8px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     justify-content: flex-start;
+    position: relative;
 }
 
 .logout-button {
@@ -169,6 +171,7 @@ const sidebarItems = [
     overflow-y: auto;
     scrollbar-width: none;
     margin-bottom: 10px;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .sidebar-collapsed .sidebar-items {
@@ -185,11 +188,12 @@ const sidebarItems = [
     padding: 12px 15px;
     border-radius: 8px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     width: 100%;
     box-sizing: border-box;
     justify-content: flex-start;
     background-color: transparent;
+    position: relative;
 }
 
 .sidebar-collapsed .sidebar-item {
@@ -214,7 +218,7 @@ const sidebarItems = [
     color: #6B7280;
     min-width: 24px;
     text-align: center;
-    transition: all 0.2s;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .sidebar-collapsed .item-icon {
@@ -231,6 +235,7 @@ const sidebarItems = [
     margin-left: 12px;
     opacity: 1;
     transform: translateX(0);
+    position: relative;
 }
 
 .sidebar-collapsed .label {
@@ -274,6 +279,7 @@ const sidebarItems = [
     align-items: center;
     border-top: 1px solid rgba(0, 0, 0, 0.05);
     width: 100%;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .sidebar-collapsed .sidebar-footer {
