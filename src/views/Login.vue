@@ -71,8 +71,19 @@ const handleLogin = async () => {
   
   try {
     await auth.loginUser(username.value, password.value);
-    sessionStorage.setItem('justLoggedIn', 'true');
     
+    // Сначала показываем уведомление
+    toast.add({
+      severity: 'success',
+      summary: 'Успешно',
+      detail: 'Вы успешно вошли в систему',
+      life: 3000
+    });
+
+    // Ждем немного, чтобы пользователь увидел уведомление
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Затем перенаправляем
     const redirectPath = router.currentRoute.value.query.redirect || '/dashboard';
     router.push(redirectPath);
   } catch (err) {
