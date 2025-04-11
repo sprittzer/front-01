@@ -8,6 +8,13 @@ const router = createRouter({
   history: createWebHistory(),
   routes: [
     { 
+      path: '/',
+      redirect: (to) => {
+        const authStore = useAuthStore();
+        return authStore.isAuthenticated ? '/dashboard' : '/login';
+      }
+    },
+    { 
       path: '/login', 
       name: 'Login', 
       component: Login, 
@@ -27,7 +34,7 @@ const router = createRouter({
     },
     {
       path: '/:pathMatch(.*)*',
-      redirect: '/dashboard'
+      redirect: '/'
     }
   ],
 });
@@ -35,13 +42,13 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
   
-  if (to.meta.requiresAuth && !authStore.isLoggedIn) {
+  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     // Сохраняем текущий путь для редиректа после входа
     next({
       path: '/login',
       query: { redirect: to.fullPath }
     });
-  } else if (to.name === 'Login' && authStore.isLoggedIn) {
+  } else if (to.name === 'Login' && authStore.isAuthenticated) {
     // Если пользователь уже авторизован, перенаправляем на dashboard
     next('/dashboard');
   } else {
