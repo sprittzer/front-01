@@ -1,6 +1,7 @@
 <template>
   <div class="dashboard">
     <h1 class="dashboard-title">Прогнозирование продаж CUDO</h1>
+    <FileUpload />
     
     <!-- Основной график прогнозов -->
     <div class="main-chart-container">
@@ -154,6 +155,7 @@
 import { ref, computed } from 'vue';
 import Chart from 'primevue/chart';
 import Card from 'primevue/card';
+import FileUpload from '../components/FileUpload.vue';
 
 // Основной график продаж
 const salesChartData = ref({
