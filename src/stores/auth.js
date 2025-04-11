@@ -3,57 +3,34 @@ import { login, logout } from '../api/auth';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    token: localStorage.getItem('authToken') || null,
-    username: localStorage.getItem('username') || null,
-    isLoading: false,
-    error: null
+    token: localStorage.getItem('token') || null,
+    isAuthenticated: !!localStorage.getItem('token')
   }),
-
-  getters: {
-    isAuthenticated: (state) => !!state.token,
-  },
 
   actions: {
     async loginUser(username, password) {
-      this.isLoading = true;
-      this.error = null;
-
       try {
-        
-        const data = await login(username, password);
-        this.token = data.token;
-        this.username = username;
-        
-        localStorage.setItem('authToken', data.token);
-        localStorage.setItem('username', username);
-        
-        return true;
+        const response = await login(username, password);
+        this.token = response.token;
+        this.isAuthenticated = true;
+        localStorage.setItem('token', response.token);
+        return response;
       } catch (error) {
-        this.error = error.message || 'Ошибка входа';
-        this.clearAuthData();
+        this.token = null;
+        this.isAuthenticated = false;
+        localStorage.removeItem('token');
         throw error;
-      } finally {
-        this.isLoading = false;
       }
     },
 
     async logoutUser() {
       try {
-        if (this.token) {
-          await logout();
-        }
-      } catch (error) {
-        console.error('Ошибка при выходе:', error);
+        await logout();
       } finally {
-        this.clearAuthData();
+        this.token = null;
+        this.isAuthenticated = false;
+        localStorage.removeItem('token');
       }
-    },
-
-    clearAuthData() {
-      this.token = null;
-      this.username = null;
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('username');
     }
   }
 });
