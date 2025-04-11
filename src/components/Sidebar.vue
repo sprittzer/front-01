@@ -90,7 +90,7 @@ const sidebarItems = [
     flex-direction: column;
     padding: 20px 0;
     z-index: 1000;
-    transition: all 0.3s ease;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     background-image: url('noise.jpeg');
     background-size: cover;
 }
@@ -227,12 +227,17 @@ const sidebarItems = [
     font-weight: 500;
     color: #4B5563;
     white-space: nowrap;
-    transition: all 0.3s;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     margin-left: 12px;
+    opacity: 1;
+    transform: translateX(0);
 }
 
 .sidebar-collapsed .label {
-    display: none;
+    opacity: 0;
+    transform: translateX(-10px);
+    position: absolute;
+    pointer-events: none;
 }
 
 /* Кнопка переключения */
