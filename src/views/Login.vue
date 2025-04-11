@@ -78,9 +78,7 @@ const handleLogin = async () => {
       life: 3000
     });
     
-    // Получаем URL для перенаправления из query параметров или используем /dashboard по умолчанию
-    const redirectPath = router.currentRoute.value.query.redirect || '/dashboard';
-    router.push(redirectPath);
+    router.push('/login');
   } catch (err) {
     error.value = err?.error || 'Ошибка входа';
     toast.add({
