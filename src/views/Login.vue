@@ -77,9 +77,10 @@ const handleLogin = async () => {
       detail: 'Вы успешно вошли в систему',
       life: 3000
     });
-    setTimeout(() => {
-      router.push('/dashboard');
-    }, 1000);
+    
+    // Получаем URL для перенаправления из query параметров или используем /dashboard по умолчанию
+    const redirectPath = router.currentRoute.value.query.redirect || '/dashboard';
+    router.push(redirectPath);
   } catch (err) {
     error.value = err?.error || 'Ошибка входа';
     toast.add({
