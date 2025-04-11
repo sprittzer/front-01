@@ -97,6 +97,7 @@ const sidebarItems = [
 
 .sidebar-collapsed {
     width: 70px;
+    padding: 20px 0;
 }
 
 /* Секция входа/выхода */
@@ -108,7 +109,7 @@ const sidebarItems = [
 }
 
 .sidebar-collapsed .logout-section {
-    padding-bottom: 10px;
+    padding: 0 13px 10px;
     border-bottom: none;
 }
 
@@ -175,6 +176,7 @@ const sidebarItems = [
 }
 
 .sidebar-collapsed .sidebar-items {
+    padding: 15px 13px;
     border-bottom: none;
 }
 
@@ -284,7 +286,7 @@ const sidebarItems = [
 
 .sidebar-collapsed .sidebar-footer {
     border-top: none;
-    padding: 15px 0;
+    padding: 15px 13px;
 }
 
 @media (max-width: 768px) {
