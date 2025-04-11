@@ -1,5 +1,5 @@
 <template>
-  <div class="file-upload">
+  <div class="file-uploader">
     <div class="upload-card">
       <h3>Загрузка файла</h3>
       
@@ -18,7 +18,7 @@
 
         <div class="input-field">
           <label for="file">Файл</label>
-          <FileUpload
+          <PrimeFileUpload
             mode="basic"
             :multiple="false"
             :auto="true"
@@ -43,7 +43,7 @@
 import { ref } from 'vue';
 import { useToast } from 'primevue/usetoast';
 import Dropdown from 'primevue/dropdown';
-import FileUpload from 'primevue/fileupload';
+import FileUpload as PrimeFileUpload from 'primevue/fileupload';
 import axios from 'axios';
 
 const toast = useToast();
@@ -113,7 +113,7 @@ const onUpload = async (event) => {
 </script>
 
 <style scoped>
-.file-upload {
+.file-uploader {
   padding: 20px;
 }
 
