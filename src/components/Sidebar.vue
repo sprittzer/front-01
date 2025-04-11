@@ -38,18 +38,32 @@
 import { ref } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
+import { useToast } from 'primevue/usetoast';
 
 const router = useRouter();
 const $route = useRoute();
 const auth = useAuthStore();
+const toast = useToast();
 const collapsed = ref(false);
 
 async function handleLogout() {
   try {
     await auth.logoutUser();
-    router.push('/login');
+    toast.add({
+      severity: 'success',
+      summary: 'Успешно',
+      detail: 'Вы успешно вышли из системы',
+      life: 3000
+    });
+    router.push('/');
   } catch (error) {
     console.error('Ошибка при выходе:', error);
+    toast.add({
+      severity: 'error',
+      summary: 'Ошибка',
+      detail: 'Произошла ошибка при выходе из системы',
+      life: 3000
+    });
   }
 }
 
