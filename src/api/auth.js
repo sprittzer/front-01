@@ -11,6 +11,15 @@ const api = axios.create({
   }
 });
 
+// Добавляем перехватчик для добавления токена авторизации
+api.interceptors.request.use(config => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers['Authorization'] = `Token ${token}`;
+  }
+  return config;
+});
+
 // Добавляем перехватчик для логирования запросов
 api.interceptors.request.use(config => {
   console.log('Отправка запроса:', {
@@ -66,8 +75,9 @@ export async function login(username, password) {
 export async function logout() {
   try {
     console.log('Попытка выхода');
-    await api.post('/logout/');
-    console.log('Успешный выход');
+    const response = await api.post('/logout/');
+    console.log('Успешный выход:', response.data);
+    return response.data;
   } catch (error) {
     console.error('Ошибка выхода:', {
       status: error.response?.status,
