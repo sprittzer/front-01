@@ -1,5 +1,6 @@
 <template>
   <div class="login-container">
+    <Toast />
     <div class="login-card">
       <div class="login-header">
         <h2>Вход в систему</h2>
@@ -49,9 +50,11 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
+import { useToast } from 'primevue/usetoast';
 import InputText from 'primevue/inputtext';
 import Password from 'primevue/password';
 import Button from 'primevue/button';
+import Toast from 'primevue/toast';
 
 const username = ref('');
 const password = ref('');
@@ -60,6 +63,7 @@ const isLoading = ref(false);
 
 const router = useRouter();
 const auth = useAuthStore();
+const toast = useToast();
 
 const handleLogin = async () => {
   error.value = '';
@@ -67,9 +71,23 @@ const handleLogin = async () => {
   
   try {
     await auth.loginUser(username.value, password.value);
-    router.push('/dashboard');
+    toast.add({
+      severity: 'success',
+      summary: 'Успешно',
+      detail: 'Вы успешно вошли в систему',
+      life: 3000
+    });
+    setTimeout(() => {
+      router.push('/dashboard');
+    }, 1000);
   } catch (err) {
     error.value = err?.error || 'Ошибка входа';
+    toast.add({
+      severity: 'error',
+      summary: 'Ошибка',
+      detail: error.value,
+      life: 3000
+    });
   } finally {
     isLoading.value = false;
   }
