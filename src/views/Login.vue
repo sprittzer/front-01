@@ -71,14 +71,10 @@ const handleLogin = async () => {
   
   try {
     await auth.loginUser(username.value, password.value);
-    toast.add({
-      severity: 'success',
-      summary: 'Успешно',
-      detail: 'Вы успешно вошли в систему',
-      life: 3000
-    });
+    sessionStorage.setItem('justLoggedIn', 'true');
     
-    router.push('/login');
+    const redirectPath = router.currentRoute.value.query.redirect || '/dashboard';
+    router.push(redirectPath);
   } catch (err) {
     error.value = err?.error || 'Ошибка входа';
     toast.add({
