@@ -270,4 +270,3 @@ const sidebarItems = [
     }
 }
 </style>
-</style>
