@@ -40,8 +40,17 @@ onMounted(() => {
 
 <style>
 /* Глобальные стили */
+.main-content {
+    margin-left: 200px;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 .main-content.no-sidebar {
-  margin-left: 0;
-  margin: 10px;
+    margin-left: 0;
+    margin: 10px;
+}
+
+.sidebar-collapsed ~ .main-content {
+    margin-left: 90px;
 }
 </style>
