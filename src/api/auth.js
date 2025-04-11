@@ -5,18 +5,10 @@ const API_URL = 'https://quartzcrystal.pythonanywhere.com';
 // Создаем экземпляр Axios
 const api = axios.create({
   baseURL: API_URL,
-  withCredentials: true,
   headers: {
     'Accept': 'application/json',
     'Content-Type': 'application/json',
   }
-});
-
-api.interceptors.request.use(config => {
-  if (['post', 'put', 'patch', 'delete'].includes(config.method?.toLowerCase())) {
-    config.headers['X-CSRFToken'] = 'zTQ9ubZqezwPXR2QjDSK5gZGch4S1RFx';
-  }
-  return config;
 });
 
 // Функция входа
