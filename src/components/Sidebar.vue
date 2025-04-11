@@ -101,14 +101,14 @@ const sidebarItems = [
 
 /* Секция входа/выхода */
 .logout-section {
-    padding: 0 15px 20px;
-    margin-bottom: 10px;
+    padding: 0 15px 10px;
+    margin-bottom: 5px;
     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .sidebar-collapsed .logout-section {
-    padding-bottom: 15px;
+    padding-bottom: 10px;
     border-bottom: none;
 }
 
