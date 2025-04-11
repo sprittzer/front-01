@@ -28,7 +28,7 @@
     
     <div class="sidebar-footer">
       <button class="toggle-button" @click="toggleCollapse">
-        <i :class="collapsed ? 'pi pi-arrow-circle-right' : 'pi pi-arrow-circle-left'" />
+        <i :class="collapsed ? 'pi pi-arrow-right' : 'pi pi-arrow-left'" />
       </button>
     </div>
   </div>
@@ -245,11 +245,12 @@ const sidebarItems = [
     font-size: 22px;
     color: #6B7280;
     background-color: rgba(231, 231, 231, 0.3);
-    border-radius: 10px;
+    border-radius: 8px;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     border: 1px solid rgba(0, 0, 0, 0.05);
+    aspect-ratio: 1;
 }
 
 .toggle-button:hover {
