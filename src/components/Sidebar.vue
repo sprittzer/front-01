@@ -1,9 +1,13 @@
 <template>
   <div class="sidebar" :class="{ 'sidebar-collapsed': collapsed }">
     <div class="logout-section">
-      <div class="logout-button" @click="logout">
+      <div v-if="auth.isAuthenticated" class="logout-button" @click="handleLogout">
         <i class="pi pi-sign-out" />
         <span class="label" :class="{ 'label-hidden': collapsed }">Выйти</span>
+      </div>
+      <div v-else class="login-button" @click="router.push('/login')">
+        <i class="pi pi-sign-in" />
+        <span class="label" :class="{ 'label-hidden': collapsed }">Войти</span>
       </div>
     </div>
     
@@ -33,34 +37,22 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import axios from 'axios';
+import { useAuthStore } from '../stores/auth';
 
 const router = useRouter();
 const $route = useRoute();
+const auth = useAuthStore();
 const collapsed = ref(false);
 
-async function logout() {
-  const token = localStorage.getItem('token');
-  if (!token) {
-    router.push('/login');
-    return;
-  }
-
+async function handleLogout() {
   try {
-    await axios.post('https://quartzcrystal.pythonanywhere.com/logout/', null, {
-      headers: {
-        Authorization: `Token ${token}`,
-      },
-    });
-
-    localStorage.removeItem('token');
+    await auth.logoutUser();
     router.push('/login');
   } catch (error) {
     console.error('Ошибка при выходе:', error);
-    localStorage.removeItem('token'); // даже если сервер не ответил — чистим токен
-    router.push('/login');
   }
 }
+
 function toggleCollapse() {
   collapsed.value = !collapsed.value;
   console.log('Sidebar collapsed:', collapsed.value); // Для отладки
@@ -93,7 +85,7 @@ const sidebarItems = [
     width: 70px;
 }
 
-/* Секция выхода */
+/* Секция входа/выхода */
 .logout-section {
     padding: 0 15px 20px;
     margin-bottom: 10px;
@@ -105,19 +97,27 @@ const sidebarItems = [
     border-bottom: none;
 }
 
-/* Кнопка выхода */
-.logout-button {
+/* Кнопки входа/выхода */
+.logout-button, .login-button {
     display: flex;
     align-items: center;
     padding: 12px 15px;
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s;
-    color: #EF4444;
     justify-content: flex-start;
 }
 
-.sidebar-collapsed .logout-button {
+.logout-button {
+    color: #EF4444;
+}
+
+.login-button {
+    color: #3B82F6;
+}
+
+.sidebar-collapsed .logout-button,
+.sidebar-collapsed .login-button {
     justify-content: center;
     padding: 0;
     height: 44px;
@@ -130,12 +130,18 @@ const sidebarItems = [
     background-color: rgba(239, 68, 68, 0.1);
 }
 
-.logout-button i {
+.login-button:hover {
+    background-color: rgba(59, 130, 246, 0.1);
+}
+
+.logout-button i,
+.login-button i {
     font-size: 20px;
     margin-right: 12px;
 }
 
-.sidebar-collapsed .logout-button i {
+.sidebar-collapsed .logout-button i,
+.sidebar-collapsed .login-button i {
     margin-right: 0;
 }
 
@@ -263,4 +269,5 @@ const sidebarItems = [
         width: 70px;
     }
 }
+</style>
 </style>
