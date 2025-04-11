@@ -43,7 +43,7 @@
 import { ref } from 'vue';
 import { useToast } from 'primevue/usetoast';
 import Dropdown from 'primevue/dropdown';
-import FileUpload as PrimeFileUpload from 'primevue/fileupload';
+import { FileUpload as PrimeFileUpload } from 'primevue/fileupload';
 import axios from 'axios';
 
 const toast = useToast();
