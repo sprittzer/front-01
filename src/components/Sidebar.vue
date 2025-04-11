@@ -28,7 +28,7 @@
     
     <div class="sidebar-footer">
       <button class="toggle-button" @click="toggleCollapse">
-        <i :class="collapsed ? 'pi pi-arrow-right' : 'pi pi-arrow-left'" />
+        <i :class="collapsed ? 'pi pi-chevron-right' : 'pi pi-chevron-left'" />
       </button>
     </div>
   </div>
@@ -266,11 +266,14 @@ const sidebarItems = [
     padding: 15px;
     display: flex;
     justify-content: center;
+    align-items: center;
     border-top: 1px solid rgba(0, 0, 0, 0.05);
+    width: 100%;
 }
 
 .sidebar-collapsed .sidebar-footer {
     border-top: none;
+    padding: 15px 0;
 }
 
 @media (max-width: 768px) {
