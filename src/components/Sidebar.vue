@@ -168,7 +168,6 @@ const sidebarItems = [
     padding: 15px;
     overflow-y: auto;
     scrollbar-width: none;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     margin-bottom: 10px;
 }
 
