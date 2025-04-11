@@ -36,6 +36,7 @@
           label="Войти" 
           class="login-button"
           icon="pi pi-sign-in"
+          :loading="isLoading"
         />
 
         <p v-if="error" class="error-message">{{ error }}</p>
@@ -55,17 +56,22 @@ import Button from 'primevue/button';
 const username = ref('');
 const password = ref('');
 const error = ref('');
+const isLoading = ref(false);
 
 const router = useRouter();
 const auth = useAuthStore();
 
 const handleLogin = async () => {
   error.value = '';
+  isLoading.value = true;
+  
   try {
     await auth.loginUser(username.value, password.value);
     router.push('/dashboard');
   } catch (err) {
-    error.value = err?.message || 'Ошибка входа';
+    error.value = err?.error || 'Ошибка входа';
+  } finally {
+    isLoading.value = false;
   }
 };
 </script>
@@ -158,21 +164,11 @@ const handleLogin = async () => {
   background: #2c387e;
 }
 
-.login-footer {
+.error-message {
+  color: #ef4444;
   text-align: center;
-  margin-top: 2rem;
-  color: #757575;
+  margin-top: 1rem;
   font-size: 0.9rem;
-}
-
-.login-footer a {
-  color: #3f51b5;
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.login-footer a:hover {
-  text-decoration: underline;
 }
 
 .p-input-icon-left {
