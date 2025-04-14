@@ -11,11 +11,9 @@
   to = "/.netlify/functions/proxy/:splat"
   status = 200
   force = true
-  conditions = {Path: ["/api/*"]}
 
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
-  force = true
-  conditions = {Path: ["!*.js", "!*.css", "!*.png", "!*.jpg", "!*.jpeg", "!*.gif", "!*.ico", "!*.svg", "!*.woff", "!*.woff2", "!*.ttf", "!*.eot", "!*.otf", "!*.json", "!*.xml"]} 
+  force = true 
