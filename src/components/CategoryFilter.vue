@@ -1,42 +1,50 @@
 <template>
     <div>
       <label for="category">Категория:</label>
-      <select id="category" v-model="selectedCategory" @change="emitCategory">
-        <option value="">Все категории</option>
-        <option v-for="category in categories" :key="category.id" :value="category.id">
-          {{ category.name }}
-        </option>
-      </select>
+      <Dropdown
+        inputId="category"
+        v-model="selectedCategory"
+        :options="categoriesWithAllOption"
+        optionLabel="name"
+        optionValue="id"
+        placeholder="Выберите категорию"
+        @change="emitCategory"
+        class="p-inputtext-sm"
+      />
     </div>
   </template>
   
-  <script>
-  import axios from 'axios' // Или ваш предпочитаемый HTTP-клиент
+  <script setup>
+  import { ref, computed } from 'vue'
+  import Dropdown from 'primevue/dropdown'
   
-  export default {
-    name: 'CategoryFilter',
-    data() {
-      return {
-        categories: [],
-        selectedCategory: ''
-      }
-    },
-    mounted() {
-      this.fetchCategories()
-    },
-    methods: {
-      async fetchCategories() {
-        try {
-          const response = await axios.get('/categories/')
-          this.categories = response.data
-        } catch (error) {
-          console.error('Ошибка при получении категорий:', error)
-        }
-      },
-      emitCategory() {
-        this.$emit('category-selected', this.selectedCategory)
-      }
+  const props = defineProps({
+    categories: {
+      type: Array,
+      required: true
     }
+  })
+  
+  const emit = defineEmits(['category-selected'])
+  
+  const selectedCategory = ref(null)
+  
+  // Добавляем опцию "Все категории" в начало списка
+  const categoriesWithAllOption = computed(() => [
+    { id: null, name: 'Все категории' },
+    ...props.categories
+  ])
+  
+  const emitCategory = (event) => {
+    emit('category-selected', event.value)
   }
   </script>
   
+  <style scoped>
+  /* Опциональные стили */
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+  }
+  </style>
