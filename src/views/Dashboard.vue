@@ -3,10 +3,10 @@
     <h1 class="dashboard-title">Прогнозирование продаж CUDO</h1>
     <FileUpload />
 
-    <div class="filters">
+    <!-- <div class="filters">
       <CategoryFilter @category-selected="onCategorySelected" />
       <DateRangePicker @date-range-selected="onDateRangeSelected" />
-    </div>
+    </div> -->
 
     <!-- Основной график прогнозов -->
     <div class="main-chart-container">
@@ -23,7 +23,7 @@
       </Card>
     </div>
 
-    <!-- Блоки статистики -->
+    <!-- Блоки статистики
     <div class="metrics-grid">
       <Card class="metric-card accuracy-card">
         <template #title>
@@ -74,7 +74,7 @@
       </Card>
     </div>
 
-    <!-- Первая строка графиков -->
+    Первая строка графиков
     <div class="secondary-charts">
       <Card class="chart-card seasonality-card">
         <template #title>
@@ -107,7 +107,7 @@
       </Card>
     </div>
 
-    <!-- Вторая строка графиков -->
+    Вторая строка графиков
     <div class="secondary-charts">
       <Card class="chart-card regions-card">
         <template #title>
@@ -134,7 +134,7 @@
       </Card>
     </div>
 
-    <!-- Блок с кластерами -->
+    Блок с кластерами
     <div class="clusters-section">
       <Card class="chart-card clusters-card">
         <template #title>
@@ -153,7 +153,7 @@
           </div>
         </template>
       </Card>
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -162,12 +162,12 @@ import { ref, computed, onMounted } from 'vue'
 import Chart from 'primevue/chart'
 import Card from 'primevue/card'
 import FileUpload from '../components/FileUpload.vue'
-import CategoryFilter from '../components/CategoryFilter.vue'
-import DateRangePicker from '../components/DateRangePicker.vue'
+// import CategoryFilter from '../components/CategoryFilter.vue'
+// import DateRangePicker from '../components/DateRangePicker.vue'
 import axios from 'axios'
 
 // Filters
-const selectedCategory = ref('')
+// const selectedCategory = ref('')
 const startDate = ref('2024-08-01') // Default start date
 const endDate = ref('2024-11-15') // Default end date
 
@@ -230,231 +230,229 @@ const loading = ref(false)
 const errorMessage = ref('')
 
 // Mock data - replace with actual data from API
-const forecastAccuracy = ref(87.5)
-const accuracyChange = ref(2.3)
-const forecastVolume = ref(9250000)
-const underloads = ref(342)
-const underloadsLoss = ref(12.7)
-const underloadsPercentage = ref(15)
+// const forecastAccuracy = ref(87.5)
+// const accuracyChange = ref(2.3)
+// const forecastVolume = ref(9250000)
+// const underloads = ref(342)
+// const underloadsLoss = ref(12.7)
+// const underloadsPercentage = ref(15)
 
-const formattedForecastVolume = computed(() => {
-  return new Intl.NumberFormat('ru-RU').format(forecastVolume.value) + ' руб.'
-})
+// const formattedForecastVolume = computed(() => {
+//   return new Intl.NumberFormat('ru-RU').format(forecastVolume.value) + ' руб.'
+// })
 
-const forecastTrend = ref(Array.from({ length: 6 }, (_, i) => 30 + i * 12))
+// const forecastTrend = ref(Array.from({ length: 6 }, (_, i) => 30 + i * 12))
 
 // Mock data for secondary charts
-const seasonalityData = ref({
-  labels: ['Зимняя химия', 'Строительная', 'Автомобильная', 'Бытовая'],
-  datasets: [
-    {
-      label: 'Коэффициент сезонности',
-      data: [2.8, 1.2, 1.5, 0.9],
-      backgroundColor: ['#7E57C2', '#29B6F6', '#66BB6A', '#FF7043'],
-      borderColor: ['#7E57C2', '#29B6F6', '#66BB6A', '#FF7043'],
-      borderWidth: 1
-    }
-  ]
-})
+// const seasonalityData = ref({
+//   labels: ['Зимняя химия', 'Строительная', 'Автомобильная', 'Бытовая'],
+//   datasets: [
+//     {
+//       label: 'Коэффициент сезонности',
+//       data: [2.8, 1.2, 1.5, 0.9],
+//       backgroundColor: ['#7E57C2', '#29B6F6', '#66BB6A', '#FF7043'],
+//       borderColor: ['#7E57C2', '#29B6F6', '#66BB6A', '#FF7043'],
+//       borderWidth: 1
+//     }
+//   ]
+// })
 
-const categoriesData = ref({
-  labels: ['Автохимия', 'Строительная химия', 'Бытовая химия', 'Спецхимия'],
-  datasets: [
-    {
-      data: [45, 30, 15, 10],
-      backgroundColor: ['#7E57C2', '#29B6F6', '#66BB6A', '#FF7043'],
-      borderWidth: 0
-    }
-  ]
-})
+// const categoriesData = ref({
+//   labels: ['Автохимия', 'Строительная химия', 'Бытовая химия', 'Спецхимия'],
+//   datasets: [
+//     {
+//       data: [45, 30, 15, 10],
+//       backgroundColor: ['#7E57C2', '#29B6F6', '#66BB6A', '#FF7043'],
+//       borderWidth: 0
+//     }
+//   ]
+// })
 
-const barOptions = ref({
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: {
-    legend: {
-      display: false
-    }
-  },
-  scales: {
-    y: {
-      beginAtZero: true,
-      grid: {
-        color: 'rgba(0, 0, 0, 0.05)'
-      }
-    },
-    x: {
-      grid: {
-        display: false
-      }
-    }
-  }
-})
+// const barOptions = ref({
+//   responsive: true,
+//   maintainAspectRatio: false,
+//   plugins: {
+//     legend: {
+//       display: false
+//     }
+//   },
+//   scales: {
+//     y: {
+//       beginAtZero: true,
+//       grid: {
+//         color: 'rgba(0, 0, 0, 0.05)'
+//       }
+//     },
+//     x: {
+//       grid: {
+//         display: false
+//       }
+//     }
+//   }
+// })
 
-const pieOptions = ref({
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: {
-    legend: {
-      display: false
-    }
-  },
-  cutout: '70%'
-})
+// const pieOptions = ref({
+//   responsive: true,
+//   maintainAspectRatio: false,
+//   plugins: {
+//     legend: {
+//       display: false
+//     }
+//   },
+//   cutout: '70%'
+// })
 
-const regionsData = ref({
-  labels: ['ЦФО', 'СЗФО', 'ЮФО', 'ПФО', 'УФО', 'СФО', 'ДВФО'],
-  datasets: [
-    {
-      label: 'Продажи, тыс. руб.',
-      data: [4200, 2800, 3100, 2500, 1800, 2200, 1500],
-      borderColor: '#FF7043',
-      backgroundColor: 'rgba(255, 112, 67, 0.2)',
-      tension: 0.3,
-      borderWidth: 2
-    }
-  ]
-})
+// const regionsData = ref({
+//   labels: ['ЦФО', 'СЗФО', 'ЮФО', 'ПФО', 'УФО', 'СФО', 'ДВФО'],
+//   datasets: [
+//     {
+//       label: 'Продажи, тыс. руб.',
+//       data: [4200, 2800, 3100, 2500, 1800, 2200, 1500],
+//       borderColor: '#FF7043',
+//       backgroundColor: 'rgba(255, 112, 67, 0.2)',
+//       tension: 0.3,
+//       borderWidth: 2
+//     }
+//   ]
+// })
 
-const regionsOptions = ref({
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: {
-    legend: {
-      display: false
-    }
-  },
-  scales: {
-    y: {
-      beginAtZero: true
-    }
-  }
-})
+// const regionsOptions = ref({
+//   responsive: true,
+//   maintainAspectRatio: false,
+//   plugins: {
+//     legend: {
+//       display: false
+//     }
+//   },
+//   scales: {
+//     y: {
+//       beginAtZero: true
+//     }
+//   }
+// })
 
-const factorsData = ref({
-  labels: ['Курс рубля', 'Сезонность', 'Логистика', 'Сырье', 'Конкуренция', 'Маркетинг'],
-  datasets: [
-    {
-      label: 'Влияние на продажи',
-      data: [65, 85, 45, 55, 40, 60],
-      backgroundColor: 'rgba(126, 87, 194, 0.2)',
-      borderColor: '#7E57C2',
-      pointBackgroundColor: '#7E57C2',
-      pointBorderColor: '#fff',
-      pointHoverBackgroundColor: '#fff',
-      pointHoverBorderColor: '#7E57C2',
-      borderWidth: 2
-    }
-  ]
-})
+// const factorsData = ref({
+//   labels: ['Курс рубля', 'Сезонность', 'Логистика', 'Сырье', 'Конкуренция', 'Маркетинг'],
+//   datasets: [
+//     {
+//       label: 'Влияние на продажи',
+//       data: [65, 85, 45, 55, 40, 60],
+//       backgroundColor: 'rgba(126, 87, 194, 0.2)',
+//       borderColor: '#7E57C2',
+//       pointBackgroundColor: '#7E57C2',
+//       pointBorderColor: '#fff',
+//       pointHoverBackgroundColor: '#fff',
+//       pointHoverBorderColor: '#7E57C2',
+//       borderWidth: 2
+//     }
+//   ]
+// })
 
-const radarOptions = ref({
-  responsive: true,
-  maintainAspectRatio: false,
-  scales: {
-    r: {
-      angleLines: {
-        display: true
-      },
-      suggestedMin: 0,
-      suggestedMax: 100
-    }
-  },
-  elements: {
-    line: {
-      tension: 0.1
-    }
-  }
-})
+// const radarOptions = ref({
+//   responsive: true,
+//   maintainAspectRatio: false,
+//   scales: {
+//     r: {
+//       angleLines: {
+//         display: true
+//       },
+//       suggestedMin: 0,
+//       suggestedMax: 100
+//     }
+//   },
+//   elements: {
+//     line: {
+//       tension: 0.1
+//     }
+//   }
+// })
 
-const clusters = ref([
-  { label: 'Высокий спрос', count: 12 },
-  { label: 'Средний спрос', count: 25 },
-  { label: 'Низкий спрос', count: 18 },
-  { label: 'Сезонный спрос', count: 8 }
-])
+// const clusters = ref([
+//   { label: 'Высокий спрос', count: 12 },
+//   { label: 'Средний спрос', count: 25 },
+//   { label: 'Низкий спрос', count: 18 },
+//   { label: 'Сезонный спрос', count: 8 }
+// ])
 
-const clusterColors = ['#7E57C2', '#29B6F6', '#66BB6A', '#FF7043']
+// const clusterColors = ['#7E57C2', '#29B6F6', '#66BB6A', '#FF7043']
 
-const clustersData = ref({
-  datasets: clusters.value.map((cluster, index) => ({
-    label: cluster.label,
-    data: Array.from({ length: cluster.count }, () => ({
-      x: Math.random() * 80 + (index * 20),
-      y: Math.random() * 80 + (index * 15),
-      r: Math.random() * 10 + 5
-    })),
-    backgroundColor: clusterColors[index],
-    borderColor: clusterColors[index]
-  }))
-})
+// const clustersData = ref({
+//   datasets: clusters.value.map((cluster, index) => ({
+//     label: cluster.label,
+//     data: Array.from({ length: cluster.count }, () => ({
+//       x: Math.random() * 80 + (index * 20),
+//       y: Math.random() * 80 + (index * 15),
+//       r: Math.random() * 10 + 5
+//     })),
+//     backgroundColor: clusterColors[index],
+//     borderColor: clusterColors[index]
+//   }))
+// })
 
-const scatterOptions = ref({
-  responsive: true,
-  maintainAspectRatio: false,
-  scales: {
-    x: {
-      title: {
-        display: true,
-        text: 'Объем продаж'
-      }
-    },
-    y: {
-      title: {
-        display: true,
-        text: 'Рост продаж'
-      }
-    }
-  },
-  plugins: {
-    legend: {
-      display: false
-    }
-  }
-})
+// const scatterOptions = ref({
+//   responsive: true,
+//   maintainAspectRatio: false,
+//   scales: {
+//     x: {
+//       title: {
+//         display: true,
+//         text: 'Объем продаж'
+//       }
+//     },
+//     y: {
+//       title: {
+//         display: true,
+//         text: 'Рост продаж'
+//       }
+//     }
+//   },
+//   plugins: {
+//     legend: {
+//       display: false
+//     }
+//   }
+// })
 
 // Filter event handlers
-const onCategorySelected = (category) => {
-  selectedCategory.value = category
-  fetchSalesData()
-}
+// const onCategorySelected = (category) => {
+//   selectedCategory.value = category
+//   fetchSalesData()
+// }
 
-const onDateRangeSelected = (dates) => {
-  startDate.value = dates.start
-  endDate.value = dates.end
-  fetchSalesData()
-}
+// const onDateRangeSelected = (dates) => {
+//   startDate.value = dates.start
+//   endDate.value = dates.end
+//   fetchSalesData()
+// }
 
 // Fetch data from API
 const fetchSalesData = async () => {
   loading.value = true
   errorMessage.value = ''
   try {
-    let url = 'https://quartzcrystal.pythonanywhere.com/forecast/?' // Base URL
-    if (selectedCategory.value) {
-      url += `category=${selectedCategory.value}&`
-    }
-    url += `start=${startDate.value}&end=${endDate.value}`
+    // Замените на HTTPS, если ваш API поддерживает HTTPS
+    let url = 'https://quartzcrystal.pythonanywhere.com/forecast/?'; // Базовый URL API
+    // if (selectedCategory.value) {
+    //   url += `category=${selectedCategory.value}&`; // Добавляем параметр категории, если выбрана
+    // }
+    url += `start=${startDate.value}&end=${endDate.value}`; // Добавляем параметры start и end
 
-    const response = await axios.get(url)
-    const apiData = response.data
+    const response = await axios.get(url);
+    const apiData = response.data;
 
-    // Prepare chart data
-    const labels = apiData.revenue.map(item => item.date)
-    const expectedRevenue = apiData.revenue.map(item => item.expected)
-    const lowerRevenue = apiData.revenue.map(item => item.lower)
-    const upperRevenue = apiData.revenue.map(item => item.upper)
+    // Извлекаем данные из ответа API
+    const revenueData = apiData.revenue;
+    const quantityData = apiData.quantity;
 
-    const expectedQuantity = apiData.quantity.map(item => item.expected)
-    const lowerQuantity = apiData.quantity.map(item => item.lower)
-    const upperQuantity = apiData.quantity.map(item => item.upper)
+    // Преобразуем данные для Chart.js
+    const labels = revenueData.map(item => item.date);
 
     salesChartData.value = {
       labels: labels,
       datasets: [
         {
-          label: 'Прогнозируемая выручка',
-          data: expectedRevenue,
+          label: 'Ожидаемая выручка',
+          data: revenueData.map(item => item.expected),
           borderColor: '#29B6F6',
           backgroundColor: 'rgba(41, 182, 246, 0.1)',
           tension: 0.3,
@@ -462,7 +460,7 @@ const fetchSalesData = async () => {
         },
         {
           label: 'Нижняя граница выручки',
-          data: lowerRevenue,
+          data: revenueData.map(item => item.lower),
           borderColor: 'rgba(41, 182, 246, 0.5)',
           backgroundColor: 'rgba(41, 182, 246, 0.05)',
           borderDash: [5, 5],
@@ -471,7 +469,7 @@ const fetchSalesData = async () => {
         },
         {
           label: 'Верхняя граница выручки',
-          data: upperRevenue,
+          data: revenueData.map(item => item.upper),
           borderColor: 'rgba(41, 182, 246, 0.5)',
           backgroundColor: 'rgba(41, 182, 246, 0.05)',
           borderDash: [5, 5],
@@ -479,8 +477,8 @@ const fetchSalesData = async () => {
           borderWidth: 2
         },
         {
-          label: 'Прогнозируемое количество',
-          data: expectedQuantity,
+          label: 'Ожидаемое количество',
+          data: quantityData.map(item => item.expected),
           borderColor: '#7E57C2',
           backgroundColor: 'rgba(126, 87, 194, 0.1)',
           tension: 0.3,
@@ -488,7 +486,7 @@ const fetchSalesData = async () => {
         },
         {
           label: 'Нижняя граница количества',
-          data: lowerQuantity,
+          data: quantityData.map(item => item.lower),
           borderColor: 'rgba(126, 87, 194, 0.5)',
           backgroundColor: 'rgba(126, 87, 194, 0.05)',
           borderDash: [5, 5],
@@ -497,7 +495,7 @@ const fetchSalesData = async () => {
         },
         {
           label: 'Верхняя граница количества',
-          data: upperQuantity,
+          data: quantityData.map(item => item.upper),
           borderColor: 'rgba(126, 87, 194, 0.5)',
           backgroundColor: 'rgba(126, 87, 194, 0.05)',
           borderDash: [5, 5],
@@ -505,20 +503,19 @@ const fetchSalesData = async () => {
           borderWidth: 2
         }
       ]
-    }
+    };
   } catch (error) {
-    errorMessage.value = 'Ошибка при получении данных: ' + error.message
-    console.error(error)
-    salesChartData.value = {} // Clear chart data on error
+    errorMessage.value = 'Ошибка при получении данных: ' + error.message;
+    console.error(error);
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 
 // Initial data fetch
 onMounted(() => {
-  fetchSalesData()
-})
+  fetchSalesData();
+});
 </script>
 
 <style scoped>
@@ -558,7 +555,7 @@ onMounted(() => {
   width: 100%;
 }
 
-.metrics-grid {
+/*.metrics-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
@@ -732,10 +729,43 @@ onMounted(() => {
   color: #4A5568;
 }
 
+.clusters-section {
+  margin-top: 20px;
+}
+
+.clusters-card {
+  border-top: 4px solid #29B6F6;
+}
+
+.clusters-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.cluster-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.cluster-marker {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.cluster-label {
+  font-size: 0.8rem;
+  color: #4A5568;
+}
+
 @media (max-width: 992px) {
   .metrics-grid,
   .secondary-charts {
     grid-template-columns: 1fr;
   }
 }
+*/
 </style>
