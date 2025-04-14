@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { useAuthStore } from '../stores/auth';
 
-const API_URL = 'https://quartzcrystal.pythonanywhere.com/api/';
+const API_URL = 'http://91.242.229.177';
 
 // Создаём экземпляр axios
 const apiClient = axios.create({
