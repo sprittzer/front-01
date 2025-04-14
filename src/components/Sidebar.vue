@@ -75,7 +75,7 @@ function toggleCollapse() {
 
 const sidebarItems = [
   { label: 'Дашборд', icon: 'pi-chart-bar', route: '/dashboard' },
-  { label: 'Рексис', icon: 'pi-home', route: '/recsys' },
+  { label: 'Рексис', icon: 'pi-dollar', route: '/recsys' },
   { label: 'Настройки', icon: 'pi-cog', route: '/settings' },
 ];
 </script>
