@@ -58,7 +58,7 @@ api.interceptors.response.use(
 export async function login(username, password) {
   try {
     console.log('Попытка входа с данными:', { username, password });
-    const response = await api.post('/login/', {
+    const response = await api.post('/auth/login/', {
       username,
       password
     });
@@ -84,7 +84,7 @@ export async function login(username, password) {
 export async function logout() {
   try {
     console.log('Попытка выхода');
-    const response = await api.post('/logout/', {});
+    const response = await api.post('/auth/logout/', {});
     localStorage.removeItem('token');
     console.log('Успешный выход:', response.data);
     return response.data;
