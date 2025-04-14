@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://91.242.229.177';
+const API_URL = 'https://quartzcrystal.pythonanywhere.com';
 
 export const forecastService = {
   async getForecast(startDate, endDate) {
