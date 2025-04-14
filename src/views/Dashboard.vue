@@ -127,7 +127,9 @@ const quantityChartOptions = computed(() => ({
   plugins: {
     ...chartOptions.value.plugins,
     tooltip: {
-      ...chartOptions.value.plugins.tooltip,
+      backgroundColor: '#2D3748',
+      titleFont: { family: "'Inter', sans-serif", size: 14 },
+      bodyFont: { family: "'Inter', sans-serif", size: 12 },
       callbacks: {
         label: (context) => `${context.dataset.label}: ${context.raw.toLocaleString('ru-RU')} шт.`
       }
@@ -151,7 +153,9 @@ const revenueChartOptions = computed(() => ({
   plugins: {
     ...chartOptions.value.plugins,
     tooltip: {
-      ...chartOptions.value.plugins.tooltip,
+      backgroundColor: '#2D3748',
+      titleFont: { family: "'Inter', sans-serif", size: 14 },
+      bodyFont: { family: "'Inter', sans-serif", size: 12 },
       callbacks: {
         label: (context) => `${context.dataset.label}: ${context.raw.toLocaleString('ru-RU')} руб.`
       }
@@ -232,8 +236,13 @@ const createDataset = (label, data, key, color, dashed = false) => ({
 // Загрузка категорий
 const fetchCategories = async () => {
   try {
-    const { data } = await axios.get('https://quartzcrystal.pythonanywhere.com/categories/')
-    categories.value = Array.isArray(data) ? data : []
+    const response = await axios.get('https://quartzcrystal.pythonanywhere.com/categories/')
+    if (Array.isArray(response.data)) {
+            categories.value = response.data;
+        } else {
+            console.error('Categories data is not an array:', response.data);
+            errorMessage.value = 'Failed to load categories: Data is not in the correct format';
+        }
   } catch (error) {
     console.error('Ошибка загрузки категорий:', error)
     errorMessage.value = 'Ошибка загрузки категорий'
