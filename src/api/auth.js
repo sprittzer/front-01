@@ -59,11 +59,6 @@ export async function login(username, password) {
       username,
       password
     });
-    
-    if (response.data && response.data.token) {
-      localStorage.setItem('token', response.data.token);
-    }
-    
     console.log('Успешный вход:', response.data);
     return response.data;
   } catch (error) {
@@ -80,8 +75,7 @@ export async function login(username, password) {
 export async function logout() {
   try {
     console.log('Попытка выхода');
-    const response = await api.post('/logout/', {});
-    localStorage.removeItem('token');
+    const response = await api.post('/logout/');
     console.log('Успешный выход:', response.data);
     return response.data;
   } catch (error) {

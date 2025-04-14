@@ -31,14 +31,7 @@ export default {
   props: {
     forecastData: {
       type: Object,
-      required: true,
-      validator(value) {
-        return value && 
-               Array.isArray(value.revenue) && 
-               Array.isArray(value.quantity) &&
-               value.revenue.length > 0 &&
-               value.quantity.length > 0;
-      }
+      required: true
     }
   },
   data() {
@@ -66,15 +59,6 @@ export default {
   },
   computed: {
     chartData() {
-      if (!this.forecastData || 
-          !this.forecastData.revenue || 
-          !this.forecastData.quantity) {
-        return {
-          labels: [],
-          datasets: []
-        };
-      }
-
       return {
         labels: this.forecastData.revenue.map(item => item.date),
         datasets: [
