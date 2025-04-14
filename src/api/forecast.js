@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = '/api';
+const API_URL = 'https://91.242.229.177';
 
 export const forecastService = {
   async getForecast(startDate, endDate) {

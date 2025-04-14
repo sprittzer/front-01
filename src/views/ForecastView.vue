@@ -2,8 +2,8 @@
   <div class="forecast-view">
     <h1>Прогноз</h1>
     <div class="date-range">
-      <DatePicker v-model="startDate" placeholder="Дата начала" />
-      <DatePicker v-model="endDate" placeholder="Дата конца" />
+      <Calendar v-model="startDate" placeholder="Дата начала" />
+      <Calendar v-model="endDate" placeholder="Дата конца" />
       <Button label="Обновить" @click="fetchForecast" />
     </div>
     <ForecastChart v-if="forecastData" :forecast-data="forecastData" />
@@ -19,7 +19,7 @@
 <script>
 import { ref, onMounted } from 'vue';
 import { useToast } from 'primevue/usetoast';
-import DatePicker from 'primevue/datepicker';
+import Calendar from 'primevue/calendar';
 import Button from 'primevue/button';
 import ForecastChart from '@/components/ForecastChart.vue';
 import { forecastService } from '@/api/forecast';
@@ -28,7 +28,7 @@ export default {
   name: 'ForecastView',
   components: {
     ForecastChart,
-    DatePicker,
+    Calendar,
     Button
   },
   setup() {
