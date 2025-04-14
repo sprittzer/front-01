@@ -4,6 +4,7 @@ import Dashboard from './views/Dashboard.vue';
 import Login from './views/Login.vue';
 import Settings from './views/Settings.vue';
 import ForecastView from './views/ForecastView.vue';
+import Recomendation from './views/Recomendation.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL || '/'),
@@ -37,6 +38,11 @@ const router = createRouter({
       path: '/forecast',
       name: 'forecast',
       component: ForecastView
+    },
+    {
+      path: '/recsys',
+      name: 'recomendation',
+      component: Recomendation
     },
     {
       path: '/:pathMatch(.*)*',

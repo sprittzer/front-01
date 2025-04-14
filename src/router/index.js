@@ -5,10 +5,6 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/',
-      redirect: '/dashboard'
-    },
-    {
       path: '/login',
       name: 'login',
       component: () => import('../views/Login.vue'),
@@ -21,11 +17,21 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
+      path: '/recsys',
+      name: 'recomendation',
+      component: () => import('../views/Recomendation.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
       path: '/settings',
       name: 'settings',
       component: () => import('../views/Settings.vue'),
       meta: { requiresAuth: true }
-    }
+    },
+    {
+      path: '/',
+      redirect: '/dashboard'
+    },
   ]
 });
 
@@ -36,8 +42,10 @@ router.beforeEach((to, from, next) => {
   if (requiresAuth && !authStore.isAuthenticated) {
     next('/login');
   } else if (!requiresAuth && authStore.isAuthenticated) {
+    console.log('tut1')
     next('/dashboard');
   } else {
+    console.log('tut');
     next();
   }
 });

@@ -1,14 +1,10 @@
 <template>
   <div class="sidebar" :class="{ 'sidebar-collapsed': collapsed }">
     <div class="logout-section">
-      <div v-if="auth.isAuthenticated" class="logout-button" @click="handleLogout">
-        <i class="pi pi-sign-out" />
-        <span class="label" :class="{ 'label-hidden': collapsed }">Выйти</span>
-      </div>
-      <div v-else class="login-button" @click="router.push('/login')">
-        <i class="pi pi-sign-in" />
-        <span class="label" :class="{ 'label-hidden': collapsed }">Войти</span>
-      </div>
+      
+      <button class="toggle-button" @click="toggleCollapse">
+        <i :class="collapsed ? 'pi pi-chevron-right' : 'pi pi-chevron-left'" />
+      </button>
     </div>
     
     <div class="sidebar-items">
@@ -27,9 +23,14 @@
     </div>
     
     <div class="sidebar-footer">
-      <button class="toggle-button" @click="toggleCollapse">
-        <i :class="collapsed ? 'pi pi-chevron-right' : 'pi pi-chevron-left'" />
-      </button>
+      <div v-if="auth.isAuthenticated" class="logout-button" @click="handleLogout">
+        <i class="pi pi-sign-out" />
+        <span class="label" :class="{ 'label-hidden': collapsed }">Выйти</span>
+      </div>
+      <div v-else class="login-button" @click="router.push('/login')">
+        <i class="pi pi-sign-in" />
+        <span class="label" :class="{ 'label-hidden': collapsed }">Войти</span>
+      </div>
     </div>
   </div>
 </template>
@@ -73,7 +74,8 @@ function toggleCollapse() {
 }
 
 const sidebarItems = [
-  { label: 'Дашборд', icon: 'pi-home', route: '/dashboard' },
+  { label: 'Дашборд', icon: 'pi-chart-bar', route: '/dashboard' },
+  { label: 'Рексис', icon: 'pi-dollar', route: '/recsys' },
   { label: 'Настройки', icon: 'pi-cog', route: '/settings' },
 ];
 </script>
@@ -263,6 +265,8 @@ const sidebarItems = [
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     border: 1px solid rgba(0, 0, 0, 0.05);
     aspect-ratio: 1;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .toggle-button:hover {
