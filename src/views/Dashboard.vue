@@ -1,7 +1,6 @@
 <template>
   <div class="dashboard">
     <h1 class="dashboard-title">Прогнозирование продаж CUDO</h1>
-    <FileUpload />
 
     <div class="filters">
       <CategoryFilter @category-selected="onCategorySelected" :categories="categories" />
@@ -41,7 +40,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import Chart from 'primevue/chart'
 import Card from 'primevue/card'
 import FileUpload from '../components/FileUpload.vue'
@@ -114,6 +113,16 @@ const chartOptions = ref({
 const loading = ref(false)
 const errorMessage = ref('')
 
+// Computed URL
+const apiUrl = computed(() => {
+  let url = 'https://quartzcrystal.pythonanywhere.com/forecast/?'
+  if (selectedCategory.value) {
+    url += `category=${selectedCategory.value}&`
+  }
+  url += `start=${startDate.value}&end=${endDate.value}`
+  return url
+})
+
 // Filter event handlers
 const onCategorySelected = (category) => {
   selectedCategory.value = category
@@ -129,13 +138,9 @@ const fetchSalesData = async () => {
   loading.value = true
   errorMessage.value = ''
   try {
-    let url = 'https://quartzcrystal.pythonanywhere.com/forecast/?'
-    if (selectedCategory.value) {
-      url += `category=${selectedCategory.value}&`
-    }
-    url += `start=${startDate.value}&end=${endDate.value}`
+    console.log('Fetching data from:', apiUrl.value)
 
-    const response = await axios.get(url)
+    const response = await axios.get(apiUrl.value)
     console.log('API Response:', response) // Печатаем весь ответ в консоль
     const apiData = response.data
 
@@ -234,6 +239,7 @@ watch([selectedCategory, startDate, endDate], () => {
     startDate: startDate.value,
     endDate: endDate.value
   })
+  console.log('API URL:', apiUrl.value) // Выводим URL API в консоль
   fetchSalesData()
 })
 
