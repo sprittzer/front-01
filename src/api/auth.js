@@ -26,9 +26,7 @@ api.interceptors.request.use(config => {
     url: config.url,
     method: config.method,
     data: config.data,
-    headers: config.headers,
-    baseURL: config.baseURL,
-    fullURL: config.baseURL + config.url
+    headers: config.headers
   });
   return config;
 });
@@ -47,8 +45,7 @@ api.interceptors.response.use(
     console.error('Ошибка запроса:', {
       status: error.response?.status,
       data: error.response?.data,
-      message: error.message,
-      config: error.config
+      message: error.message
     });
     return Promise.reject(error);
   }
@@ -73,8 +70,7 @@ export async function login(username, password) {
     console.error('Ошибка входа:', {
       status: error.response?.status,
       data: error.response?.data,
-      message: error.message,
-      config: error.config
+      message: error.message
     });
     throw error.response?.data || { error: 'Ошибка входа' };
   }
@@ -92,8 +88,7 @@ export async function logout() {
     console.error('Ошибка выхода:', {
       status: error.response?.status,
       data: error.response?.data,
-      message: error.message,
-      config: error.config
+      message: error.message
     });
     throw error;
   }
