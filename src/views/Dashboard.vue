@@ -27,12 +27,49 @@
       <Card class="glass-card">
         <template #title>
           <span class="card-title-icon">📦</span>
-          <span>Прогнозируемое количество</span>
+          <span>Прогнозируемое количество (шт.)</span>
         </template>
         <template #content>
           <div v-if="loading">Загрузка...</div>
           <div v-else-if="errorMessage">{{ errorMessage }}</div>
-          <Chart v-else type="line" :data="quantityChartData" :options="chartOptions" class="main-chart" />
+          <Chart v-else type="line" :data="quantityChartData" :options="quantityChartOptions" class="main-chart" />
+        </template>
+      </Card>
+    </div>
+
+    <!-- Блоки дополнительной информации -->
+    <div class="data-grid">
+      <Card class="glass-card">
+        <template #title>
+          <span class="card-title-icon">🏆</span>
+          <span>Топ SKU</span>
+        </template>
+        <template #content>
+          <DataTable :value="topSku" class="p-datatable-sm" stripedRows>
+            <Column field="sku" header="SKU"></Column>
+            <Column field="quantity" header="Количество">
+              <template #body="{data}">
+                {{ data.quantity.toLocaleString('ru-RU') }} шт.
+              </template>
+            </Column>
+          </DataTable>
+        </template>
+      </Card>
+
+      <Card class="glass-card">
+        <template #title>
+          <span class="card-title-icon">👥</span>
+          <span>Топ клиентов</span>
+        </template>
+        <template #content>
+          <DataTable :value="topClients" class="p-datatable-sm" stripedRows>
+            <Column field="client" header="Клиент"></Column>
+            <Column field="price" header="Общая сумма">
+              <template #body="{data}">
+                {{ data.price.toLocaleString('ru-RU') }} тыс. руб.
+              </template>
+            </Column>
+          </DataTable>
         </template>
       </Card>
     </div>
@@ -43,207 +80,145 @@
 import { ref, onMounted, watch, computed } from 'vue'
 import Chart from 'primevue/chart'
 import Card from 'primevue/card'
-import FileUpload from '../components/FileUpload.vue'
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
 import CategoryFilter from '../components/CategoryFilter.vue'
 import DateRangePicker from '../components/DateRangePicker.vue'
 import axios from 'axios'
 
-// Filters
+// Состояния данных
+const loading = ref(false)
+const errorMessage = ref('')
+const categories = ref([])
+const topSku = ref([])
+const topClients = ref([])
+
+// Фильтры
 const selectedCategory = ref('')
 const startDate = ref('2024-08-01')
 const endDate = ref('2024-11-15')
-const categories = ref([])
 
-// Chart data and options
-const revenueChartData = ref({})
-const quantityChartData = ref({})
+// Настройки графиков
 const chartOptions = ref({
   responsive: true,
   maintainAspectRatio: false,
   plugins: {
     legend: {
       position: 'top',
-      labels: {
-        font: {
-          family: "'Inter', sans-serif",
-          size: 12
-        },
-        color: '#5A5A5A'
-      }
+      labels: { font: { family: "'Inter', sans-serif", size: 12 }, color: '#5A5A5A' }
     },
     tooltip: {
       backgroundColor: '#2D3748',
-      titleFont: {
-        family: "'Inter', sans-serif",
-        size: 14
-      },
-      bodyFont: {
-        family: "'Inter', sans-serif",
-        size: 12
-      },
-      callbacks: {
-        label: function (context) {
-          return `${context.dataset.label}: ${context.raw.toLocaleString('ru-RU')} тыс. руб.`
-        }
-      }
+      titleFont: { family: "'Inter', sans-serif", size: 14 },
+      bodyFont: { family: "'Inter', sans-serif", size: 12 }
     }
   },
   scales: {
-    y: {
-      title: {
-        display: true,
-        text: 'Значение',
-        font: {
-          family: "'Inter', sans-serif"
-        }
-      },
-      grid: {
-        color: 'rgba(0, 0, 0, 0.05)'
-      }
+    y: { 
+      title: { display: true, text: 'Значение', font: { family: "'Inter', sans-serif" } },
+      grid: { color: 'rgba(0, 0, 0, 0.05)' }
     },
-    x: {
-      grid: {
-        color: 'rgba(0, 0, 0, 0.05)'
-      }
-    }
+    x: { grid: { color: 'rgba(0, 0, 0, 0.05)' } }
   }
 })
 
-// API state
-const loading = ref(false)
-const errorMessage = ref('')
+const quantityChartOptions = computed(() => ({
+  ...chartOptions.value,
+  plugins: {
+    ...chartOptions.value.plugins,
+    tooltip: {
+      ...chartOptions.value.plugins.tooltip,
+      callbacks: {
+        label: (context) => `${context.dataset.label}: ${context.raw.toLocaleString('ru-RU')} шт.`
+      }
+    }
+  }
+}))
 
-// Computed URL
+// Данные для графиков
+const revenueChartData = ref({})
+const quantityChartData = ref({})
+
+// URL для API
 const apiUrl = computed(() => {
   let url = 'https://quartzcrystal.pythonanywhere.com/forecast/?'
-  if (selectedCategory.value) {
-    url += `category=${selectedCategory.value}&`
-  }
+  if (selectedCategory.value) url += `category=${selectedCategory.value}&`
   url += `start=${startDate.value}&end=${endDate.value}`
   return url
 })
 
-// Filter event handlers
-const onCategorySelected = (category) => {
-  selectedCategory.value = category
-}
-
+// Обработчики событий
+const onCategorySelected = (category) => selectedCategory.value = category
 const onDateRangeSelected = (dates) => {
   startDate.value = dates.start
   endDate.value = dates.end
 }
 
-// Fetch data from API
+// Загрузка данных
 const fetchSalesData = async () => {
   loading.value = true
   errorMessage.value = ''
+  
   try {
-    console.log('Fetching data from:', apiUrl.value)
-
-    const response = await axios.get(apiUrl.value)
-    console.log('API Response:', response) // Печатаем весь ответ в консоль
-    const apiData = response.data
-
-    // Charts
-    const labels = apiData.revenue.map(item => item.date)
-
-    // Revenue chart
+    const { data } = await axios.get(apiUrl.value)
+    console.log('API Response:', JSON.stringify(data, null, 2))
+    
+    // Обработка данных графиков
+    const labels = data.revenue.map(item => item.date)
+    
     revenueChartData.value = {
-      labels: labels,
+      labels,
       datasets: [
-        {
-          label: 'Ожидаемая выручка',
-          data: apiData.revenue.map(item => item.expected),
-          borderColor: '#29B6F6',
-          backgroundColor: 'rgba(41, 182, 246, 0.1)',
-          tension: 0.3,
-          borderWidth: 2
-        },
-        {
-          label: 'Нижняя граница',
-          data: apiData.revenue.map(item => item.lower),
-          borderColor: 'rgba(41, 182, 246, 0.5)',
-          backgroundColor: 'rgba(41, 182, 246, 0.05)',
-          borderDash: [5, 5],
-          tension: 0.3,
-          borderWidth: 2
-        },
-        {
-          label: 'Верхняя граница',
-          data: apiData.revenue.map(item => item.upper),
-          borderColor: 'rgba(41, 182, 246, 0.5)',
-          backgroundColor: 'rgba(41, 182, 246, 0.05)',
-          borderDash: [5, 5],
-          tension: 0.3,
-          borderWidth: 2
-        }
+        createDataset('Ожидаемая выручка', data.revenue, 'expected', '#29B6F6'),
+        createDataset('Нижняя граница', data.revenue, 'lower', 'rgba(41, 182, 246, 0.5)', true),
+        createDataset('Верхняя граница', data.revenue, 'upper', 'rgba(41, 182, 246, 0.5)', true)
       ]
     }
-
-    // Quantity chart
+    
     quantityChartData.value = {
-      labels: labels,
+      labels,
       datasets: [
-        {
-          label: 'Ожидаемое количество',
-          data: apiData.quantity.map(item => item.expected),
-          borderColor: '#7E57C2',
-          backgroundColor: 'rgba(126, 87, 194, 0.1)',
-          tension: 0.3,
-          borderWidth: 2
-        },
-        {
-          label: 'Нижняя граница',
-          data: apiData.quantity.map(item => item.lower),
-          borderColor: 'rgba(126, 87, 194, 0.5)',
-          backgroundColor: 'rgba(126, 87, 194, 0.05)',
-          borderDash: [5, 5],
-          tension: 0.3,
-          borderWidth: 2
-        },
-        {
-          label: 'Верхняя граница',
-          data: apiData.quantity.map(item => item.upper),
-          borderColor: 'rgba(126, 87, 194, 0.5)',
-          backgroundColor: 'rgba(126, 87, 194, 0.05)',
-          borderDash: [5, 5],
-          tension: 0.3,
-          borderWidth: 2
-        }
+        createDataset('Ожидаемое количество', data.quantity, 'expected', '#7E57C2'),
+        createDataset('Нижняя граница', data.quantity, 'lower', 'rgba(126, 87, 194, 0.5)', true),
+        createDataset('Верхняя граница', data.quantity, 'upper', 'rgba(126, 87, 194, 0.5)', true)
       ]
     }
+    
+    // Топ данные
+    topSku.value = data.top_sku || []
+    topClients.value = data.top_client || []
+    
   } catch (error) {
-    errorMessage.value = 'Ошибка при получении данных: ' + error.message
-    console.error(error)
+    errorMessage.value = `Ошибка: ${error.response?.data?.message || error.message}`
+    console.error('Ошибка запроса:', error)
   } finally {
     loading.value = false
   }
 }
 
-// Fetch categories from API
+const createDataset = (label, data, key, color, dashed = false) => ({
+  label,
+  data: data.map(item => item[key]),
+  borderColor: color,
+  backgroundColor: color.replace(')', ', 0.1)').replace('rgb', 'rgba'),
+  borderDash: dashed ? [5, 5] : undefined,
+  tension: 0.3,
+  borderWidth: 2
+})
+
+// Загрузка категорий
 const fetchCategories = async () => {
   try {
-    const response = await axios.get('https://quartzcrystal.pythonanywhere.com/categories/')
-    console.log('Categories Response:', response)
-    categories.value = response.data
+    const { data } = await axios.get('https://quartzcrystal.pythonanywhere.com/categories/')
+    categories.value = Array.isArray(data) ? data : []
   } catch (error) {
-    console.error('Ошибка при получении категорий:', error)
-    errorMessage.value = 'Ошибка при получении категорий: ' + error.message
+    console.error('Ошибка загрузки категорий:', error)
+    errorMessage.value = 'Ошибка загрузки категорий'
   }
 }
 
-// Watchers for filters
-watch([selectedCategory, startDate, endDate], () => {
-  console.log('Filters changed:', {
-    selectedCategory: selectedCategory.value,
-    startDate: startDate.value,
-    endDate: endDate.value
-  })
-  console.log('API URL:', apiUrl.value) // Выводим URL API в консоль
-  fetchSalesData()
-})
-
-// Initial data fetch
+// Watchers
+watch([selectedCategory, startDate, endDate], fetchSalesData)
 onMounted(() => {
   fetchSalesData()
   fetchCategories()
@@ -255,7 +230,6 @@ onMounted(() => {
 
 .dashboard {
   font-family: 'Inter', sans-serif;
-  color: #2D3748;
   padding: 20px;
   max-width: 1400px;
   margin: 0 auto;
@@ -264,20 +238,24 @@ onMounted(() => {
 .dashboard-title {
   font-weight: 600;
   font-size: 1.8rem;
-  color: #2D3748;
   margin-bottom: 2rem;
   text-align: center;
-  letter-spacing: -0.5px;
 }
 
 .main-chart-container {
   margin-bottom: 2rem;
 }
 
+.data-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
 .glass-card {
   background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
@@ -285,5 +263,17 @@ onMounted(() => {
 .main-chart {
   height: 400px;
   width: 100%;
+}
+
+.card-title-icon {
+  margin-right: 0.75rem;
+}
+
+.p-datatable {
+  font-size: 0.9rem;
+}
+
+.p-datatable-sm .p-datatable-tbody > tr > td {
+  padding: 0.5rem;
 }
 </style>
