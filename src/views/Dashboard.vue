@@ -12,12 +12,12 @@
       <Card class="glass-card">
         <template #title>
           <span class="card-title-icon">💰</span>
-          <span>Прогнозируемая выручка</span>
+          <span>Прогнозируемая выручка (тыс. руб.)</span>
         </template>
         <template #content>
           <div v-if="loading">Загрузка...</div>
           <div v-else-if="errorMessage">{{ errorMessage }}</div>
-          <Chart v-else type="line" :data="revenueChartData" :options="chartOptions" class="main-chart" />
+          <Chart v-else type="line" :data="revenueChartData" :options="revenueChartOptions" class="main-chart" />
         </template>
       </Card>
     </div>
@@ -135,6 +135,30 @@ const quantityChartOptions = computed(() => ({
   }
 }))
 
+const revenueChartOptions = computed(() => ({
+  ...chartOptions.value,
+  scales: {
+    ...chartOptions.value.scales,
+    y: {
+      ...chartOptions.value.scales.y,
+      title: {
+        display: true,
+        text: 'Тыс. руб.',
+        font: { family: "'Inter', sans-serif" }
+      }
+    }
+  },
+  plugins: {
+    ...chartOptions.value.plugins,
+    tooltip: {
+      ...chartOptions.value.plugins.tooltip,
+      callbacks: {
+        label: (context) => `${context.dataset.label}: ${context.raw.toLocaleString('ru-RU')} тыс. руб.`
+      }
+    }
+  }
+}))
+
 // Данные для графиков
 const revenueChartData = ref({})
 const quantityChartData = ref({})
@@ -161,7 +185,6 @@ const fetchSalesData = async () => {
   
   try {
     const { data } = await axios.get(apiUrl.value)
-    console.log('API Response:', JSON.stringify(data, null, 2))
     
     // Обработка данных графиков
     const labels = data.revenue.map(item => item.date)
