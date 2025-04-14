@@ -8,13 +8,6 @@
 
 [[redirects]]
   from = "/api/*"
-  to = "/.netlify/functions/proxy/:splat"
+  to = "http://91.242.229.177/:splat"
   status = 200
   force = true
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-  force = true
-  conditions = {Path: ["!*.js", "!*.css", "!*.png", "!*.jpg", "!*.jpeg", "!*.gif", "!*.ico", "!*.svg", "!*.woff", "!*.woff2", "!*.ttf", "!*.eot", "!*.otf", "!*.json", "!*.xml"]} 
