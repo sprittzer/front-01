@@ -11,7 +11,9 @@ exports.handler = async function(event, context) {
     // Формируем полный URL
     const url = `${API_URL}${path}`;
     
-    console.log('Proxying request to:', url);
+    console.log('Original path:', event.path);
+    console.log('Processed path:', path);
+    console.log('Full URL:', url);
     console.log('Method:', event.httpMethod);
     console.log('Body:', event.body);
     console.log('Headers:', event.headers);
@@ -26,8 +28,14 @@ exports.handler = async function(event, context) {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         ...(event.headers.authorization && { 'Authorization': event.headers.authorization })
+      },
+      validateStatus: function (status) {
+        return status < 500; // Разрешаем все статусы меньше 500
       }
     });
+
+    console.log('Response status:', response.status);
+    console.log('Response data:', response.data);
 
     return {
       statusCode: response.status,
