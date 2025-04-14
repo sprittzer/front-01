@@ -38,6 +38,7 @@ import axios from 'axios'
 const selectedCategory = ref('')
 const startDate = ref('2024-08-01') // Default start date
 const endDate = ref('2024-11-15') // Default end date
+const categories = ref([]) // Categories from API
 
 // Chart data and options
 const salesChartData = ref({})
@@ -114,22 +115,21 @@ const fetchSalesData = async () => {
   loading.value = true
   errorMessage.value = ''
   try {
-    // Замените на HTTPS, если ваш API поддерживает HTTPS
-    let url = 'https://quartzcrystal.pythonanywhere.com/forecast/?'; // Базовый URL API
+    let url = 'https://quartzcrystal.pythonanywhere.com/forecast/?' // Базовый URL API
     if (selectedCategory.value) {
-      url += `category=${selectedCategory.value}&`; // Добавляем параметр категории, если выбрана
+      url += `category=${selectedCategory.value}&` // Добавляем параметр категории, если выбрана
     }
-    url += `start=${startDate.value}&end=${endDate.value}`; // Добавляем параметры start и end
+    url += `start=${startDate.value}&end=${endDate.value}` // Добавляем параметры start и end
 
-    const response = await axios.get(url);
-    const apiData = response.data;
+    const response = await axios.get(url)
+    const apiData = response.data
 
     // Извлекаем данные из ответа API
-    const revenueData = apiData.revenue;
-    const quantityData = apiData.quantity;
+    const revenueData = apiData.revenue
+    const quantityData = apiData.quantity
 
     // Преобразуем данные для Chart.js
-    const labels = revenueData.map(item => item.date);
+    const labels = revenueData.map(item => item.date)
 
     salesChartData.value = {
       labels: labels,
@@ -187,19 +187,31 @@ const fetchSalesData = async () => {
           borderWidth: 2
         }
       ]
-    };
+    }
   } catch (error) {
-    errorMessage.value = 'Ошибка при получении данных: ' + error.message;
-    console.error(error);
+    errorMessage.value = 'Ошибка при получении данных: ' + error.message
+    console.error(error)
   } finally {
-    loading.value = false;
+    loading.value = false
+  }
+}
+
+// Fetch categories from API
+const fetchCategories = async () => {
+  try {
+    const response = await axios.get('https://quartzcrystal.pythonanywhere.com/categories/')
+    categories.value = response.data
+  } catch (error) {
+    console.error('Ошибка при получении категорий:', error)
+    errorMessage.value = 'Ошибка при получении категорий: ' + error.message
   }
 }
 
 // Initial data fetch
 onMounted(() => {
-  fetchSalesData();
-});
+  fetchSalesData()
+  fetchCategories()
+})
 </script>
 
 <style scoped>
