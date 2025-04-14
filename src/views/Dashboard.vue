@@ -430,7 +430,7 @@ const fetchSalesData = async () => {
   loading.value = true
   errorMessage.value = ''
   try {
-    let url = 'http://91.242.229.177/forecast/?' // Base URL
+    let url = 'https://quartzcrystal.pythonanywhere.com/forecast/?' // Base URL
     if (selectedCategory.value) {
       url += `category=${selectedCategory.value}&`
     }
