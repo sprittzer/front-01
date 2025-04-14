@@ -11,15 +11,6 @@ const api = axios.create({
   }
 });
 
-// Логируем конфигурацию API при инициализации
-console.log('API Configuration:', {
-  baseURL: API_URL,
-  endpoints: {
-    login: '/login/',
-    logout: '/logout/'
-  }
-});
-
 // Добавляем перехватчик для добавления токена авторизации
 api.interceptors.request.use(config => {
   const token = localStorage.getItem('token');
@@ -37,8 +28,7 @@ api.interceptors.request.use(config => {
     data: config.data,
     headers: config.headers,
     baseURL: config.baseURL,
-    fullURL: config.baseURL + config.url,
-    params: config.params
+    fullURL: config.baseURL + config.url
   });
   return config;
 });
@@ -49,13 +39,7 @@ api.interceptors.response.use(
     console.log('Получен ответ:', {
       status: response.status,
       data: response.data,
-      headers: response.headers,
-      config: {
-        url: response.config.url,
-        method: response.config.method,
-        baseURL: response.config.baseURL,
-        fullURL: response.config.baseURL + response.config.url
-      }
+      headers: response.headers
     });
     return response;
   },
@@ -64,14 +48,7 @@ api.interceptors.response.use(
       status: error.response?.status,
       data: error.response?.data,
       message: error.message,
-      config: {
-        url: error.config?.url,
-        method: error.config?.method,
-        baseURL: error.config?.baseURL,
-        fullURL: error.config?.baseURL + error.config?.url,
-        data: error.config?.data,
-        headers: error.config?.headers
-      }
+      config: error.config
     });
     return Promise.reject(error);
   }
@@ -81,13 +58,7 @@ api.interceptors.response.use(
 export async function login(username, password) {
   try {
     console.log('Попытка входа с данными:', { username, password });
-    const endpoint = '/login/';
-    console.log('Используемый эндпоинт:', {
-      endpoint,
-      fullURL: API_URL + endpoint
-    });
-    
-    const response = await api.post(endpoint, {
+    const response = await api.post('/auth/login/', {
       username,
       password
     });
@@ -103,14 +74,7 @@ export async function login(username, password) {
       status: error.response?.status,
       data: error.response?.data,
       message: error.message,
-      config: {
-        url: error.config?.url,
-        method: error.config?.method,
-        baseURL: error.config?.baseURL,
-        fullURL: error.config?.baseURL + error.config?.url,
-        data: error.config?.data,
-        headers: error.config?.headers
-      }
+      config: error.config
     });
     throw error.response?.data || { error: 'Ошибка входа' };
   }
@@ -120,13 +84,7 @@ export async function login(username, password) {
 export async function logout() {
   try {
     console.log('Попытка выхода');
-    const endpoint = '/logout/';
-    console.log('Используемый эндпоинт:', {
-      endpoint,
-      fullURL: API_URL + endpoint
-    });
-    
-    const response = await api.post(endpoint, {});
+    const response = await api.post('/auth/logout/', {});
     localStorage.removeItem('token');
     console.log('Успешный выход:', response.data);
     return response.data;
@@ -135,14 +93,7 @@ export async function logout() {
       status: error.response?.status,
       data: error.response?.data,
       message: error.message,
-      config: {
-        url: error.config?.url,
-        method: error.config?.method,
-        baseURL: error.config?.baseURL,
-        fullURL: error.config?.baseURL + error.config?.url,
-        data: error.config?.data,
-        headers: error.config?.headers
-      }
+      config: error.config
     });
     throw error;
   }
