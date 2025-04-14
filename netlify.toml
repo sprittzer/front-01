@@ -1,18 +1,5 @@
-[build]
-  command = "npm install && npm run build"
-  publish = "dist"
-
-[build.environment]
-  NODE_VERSION = "18"
-
 [[redirects]]
   from = "/api/*"
   to = "http://91.242.229.177/:splat"
-  status = 200
-  force = true
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
   status = 200
   force = true
