@@ -1,16 +1,12 @@
 <template>
   <div class="forecast-chart">
-    <Line
-      :data="chartData"
-      :options="chartOptions"
-    />
+    <canvas ref="chartCanvas"></canvas>
   </div>
 </template>
 
 <script>
-import { Line } from 'vue-chartjs'
 import {
-  Chart as ChartJS,
+  Chart,
   CategoryScale,
   LinearScale,
   PointElement,
@@ -20,7 +16,7 @@ import {
   Legend
 } from 'chart.js'
 
-ChartJS.register(
+Chart.register(
   CategoryScale,
   LinearScale,
   PointElement,
@@ -32,9 +28,6 @@ ChartJS.register(
 
 export default {
   name: 'ForecastChart',
-  components: {
-    Line
-  },
   props: {
     forecastData: {
       type: Object,
@@ -43,6 +36,7 @@ export default {
   },
   data() {
     return {
+      chart: null,
       chartOptions: {
         responsive: true,
         maintainAspectRatio: false,
@@ -115,6 +109,38 @@ export default {
             tension: 0.1
           }
         ]
+      }
+    }
+  },
+  watch: {
+    forecastData: {
+      handler() {
+        this.updateChart()
+      },
+      deep: true
+    }
+  },
+  mounted() {
+    this.initChart()
+  },
+  beforeUnmount() {
+    if (this.chart) {
+      this.chart.destroy()
+    }
+  },
+  methods: {
+    initChart() {
+      const ctx = this.$refs.chartCanvas.getContext('2d')
+      this.chart = new Chart(ctx, {
+        type: 'line',
+        data: this.chartData,
+        options: this.chartOptions
+      })
+    },
+    updateChart() {
+      if (this.chart) {
+        this.chart.data = this.chartData
+        this.chart.update()
       }
     }
   }
