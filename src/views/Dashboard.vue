@@ -153,7 +153,7 @@ const revenueChartOptions = computed(() => ({
     tooltip: {
       ...chartOptions.value.plugins.tooltip,
       callbacks: {
-        label: (context) => `${context.dataset.label}: ${(context.raw * 1000).toLocaleString('ru-RU')} руб.`
+        label: (context) => `${context.dataset.label}: ${context.raw.toLocaleString('ru-RU')} руб.`
       }
     }
   }
