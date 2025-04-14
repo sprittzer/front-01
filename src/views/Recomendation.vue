@@ -1,174 +1,89 @@
 <template>
-    <div class="dashboard">
-      <h1 class="dashboard-title">Прогнозирование продаж CUDO</h1>
-  
-      <div class="filters-container">
-        <div class="filters-wrapper">
-            <InputNumber v-model="value2" inputId="withoutgrouping" :useGrouping="false" fluid />
-        </div>
-      </div>
-  
-      <!-- Круговая диаграмма по категориям (только для "Все категории") -->
-      <div v-if="!selectedCategory" class="charts-grid">
-        <Card class="glass-card">
-          <template #title>
-            <span>Распределение выручки по категориям</span>
+    <!-- <div class="card"> -->
+      <DataTable :value="products" paginator :rows="5" :rowsPerPageOptions="[5, 10, 20]"
+        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
+        responsiveLayout="scroll"
+        stripedRows
+        filterDisplay="menu"
+        :globalFilterFields="['group', 'type', 'category', 'sku']">
+        
+        <template #header>
+          <div class="flex justify-content-between">
+            <h2 class="m-0">Рекомендателная система</h2>
+            <h4>Введите ID клиента и вам предложат топ товаров для него:</h4>
+            <div style="display: flex;">
+                <InputNumber v-model="value2" inputId="withoutgrouping" :useGrouping="false" fluid />
+                <Button style="margin-left: 5px;">Найти</Button>
+            </div>
+            
+          </div>
+        </template>
+        
+        <Column field="group" header="Group" sortable style="min-width: 12rem">
+          <template #body="{ data }">
+            <span class="font-bold">{{ data.group }}</span>
           </template>
-          <template #content>
-            <div v-if="ratioLoading">Загрузка распределения...</div>
-            <div v-else-if="ratioError">{{ ratioError }}</div>
-            <Chart v-else type="pie" :data="revenueRatioData" :options="ratioChartOptions" class="ratio-chart" />
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText v-model="filterModel.value" @input="filterCallback()" placeholder="Search by group" class="p-column-filter" />
           </template>
-        </Card>
-  
-        <Card class="glass-card">
-          <template #title>
-            <span>Распределение числа продаж по категориям</span>
+        </Column>
+        
+        <Column field="type" header="Type" sortable style="min-width: 16rem">
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText v-model="filterModel.value" @input="filterCallback()" placeholder="Search by type" class="p-column-filter" />
           </template>
-          <template #content>
-            <div v-if="ratioLoading">Загрузка распределения...</div>
-            <div v-else-if="ratioError">{{ ratioError }}</div>
-            <Chart v-else type="pie" :data="quantityRatioData" :options="ratioChartOptions" class="ratio-chart" />
+        </Column>
+        
+        <Column field="category" header="Category" sortable style="min-width: 12rem">
+          <template #body="{ data }">
+            <span :class="{'text-gray-500 font-italic': !data.category}">{{ data.category || 'Not specified' }}</span>
           </template>
-        </Card>
-      </div>
-  
-      <!-- График выручки -->
-      <div class="main-chart-container">
-        <Card class="glass-card">
-          <template #title>
-            <span class="card-title-icon">💰</span>
-            <span>Прогнозируемая выручка</span>
+          <template #filter="{ filterModel, filterCallback }">
+            <InputText v-model="filterModel.value" @input="filterCallback()" placeholder="Search by category" class="p-column-filter" />
           </template>
-          <template #content>
-            <div v-if="loading">Загрузка...</div>
-            <div v-else-if="errorMessage">{{ errorMessage }}</div>
-            <Chart v-else type="line" :data="revenueChartData" :options="revenueChartOptions" class="main-chart" :key="chartKey" />
+        </Column>
+        
+        <Column field="sku" header="SKU" sortable dataType="numeric" style="min-width: 8rem">
+          <template #body="{ data }">
+            <span class="font-semibold">{{ data.sku }}</span>
           </template>
-        </Card>
-      </div>
-  
-      <!-- График количества -->
-      <div class="main-chart-container">
-        <Card class="glass-card">
-          <template #title>
-            <span class="card-title-icon">📊</span>
-            <span>Прогнозируемое количество</span>
+          <template #filter="{ filterModel, filterCallback }">
+            <InputNumber v-model="filterModel.value" @input="filterCallback()" placeholder="Search by SKU" class="p-column-filter" />
           </template>
-          <template #content>
-            <div v-if="loading">Загрузка...</div>
-            <div v-else-if="errorMessage">{{ errorMessage }}</div>
-            <Chart v-else type="line" :data="quantityChartData" :options="quantityChartOptions" class="main-chart" :key="chartKey + 1" />
-          </template>
-        </Card>
-      </div>
-    </div>
+        </Column>
+      </DataTable>
+    <!-- </div> -->
   </template>
   
   <script setup>
-
+  import { ref, onMounted } from 'vue';
+  import DataTable from 'primevue/datatable';
+  import Column from 'primevue/column';
+  import InputText from 'primevue/inputtext';
+  import InputNumber from 'primevue/inputnumber';
+  import Button from 'primevue/button';
+  
+  // Data to display
+  const productsData = ref([]);
+  
+  // Reactive references
+  const products = ref([]);
+  const globalFilter = ref('');
+  
+  // Load data when component is mounted
+  onMounted(() => {
+    products.value = productsData;
+  });
   </script>
   
   <style scoped>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-  
-  .dashboard {
-    font-family: 'Inter', sans-serif;
-    padding: 20px;
-    max-width: 1400px;
-    margin: 0 auto;
-  }
-  
-  .dashboard-title {
-    font-weight: 600;
-    font-size: 1.8rem;
-    margin-bottom: 2rem;
-    text-align: center;
-  }
-  
-  .main-chart-container {
-    margin-bottom: 2rem;
-  }
-  
-  .charts-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-  }
-  
-  .glass-card {
-    background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(10px);
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  }
-  
-  .main-chart {
-    height: 400px;
-    width: 100%;
-  }
-  
-  .ratio-chart {
-    height: 350px;
-    width: 100%;
-  }
-  
-  .card-title-icon {
-    margin-right: 0.75rem;
-  }
-  
-  .p-datatable {
-    font-size: 0.9rem;
-  }
-  
-  .p-datatable-sm .p-datatable-tbody > tr > td {
-    padding: 0.5rem;
-  }
-  
-  /* Styles for filters */
-  .filters-container {
-    margin-bottom: 2rem;
-    padding: 1rem;
-    border-left: 3px solid rgba(41, 182, 246, 0.7);
-    border-right: 3px solid rgba(126, 87, 194, 0.7);
-    border-radius: 5px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  .filters-wrapper {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    padding: 1rem;
-  }
-  
-  .filter-card {
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(10px);
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    padding: 2rem;
-    border: 1px solid rgba(255, 255, 255, 0.5);
-  }
-  
-  .filter-title-icon {
-    margin-right: 0.75rem;
-    color: #5A5A5A;
-  }
-  
-  .filters {
-    display: flex;
-    gap: 20px;
-  }
-  
-  .filter-item {
-    flex: 1;
-  }
-  
-  .filter-item label {
-    margin-bottom: 0.5rem;
-    font-weight: 500;
-    color: #333;
+  .card {
+    background: var(--surface-card);
+    padding: 1.5rem;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.02), 0px 0px 2px rgba(0, 0, 0, 0.05), 0px 1px 4px rgba(0, 0, 0, 0.08);
   }
   </style>
+  
