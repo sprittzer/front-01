@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://91.242.229.177';
+const API_URL = 'https://91.242.229.177';
 
 // Создаем экземпляр Axios
 const api = axios.create({
