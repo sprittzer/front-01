@@ -12,7 +12,7 @@
       <Card class="glass-card">
         <template #title>
           <span class="card-title-icon">💰</span>
-          <span>Прогнозируемая выручка (тыс. руб.)</span>
+          <span>Прогнозируемая выручка</span>
         </template>
         <template #content>
           <div v-if="loading">Загрузка...</div>
@@ -27,7 +27,7 @@
       <Card class="glass-card">
         <template #title>
           <span class="card-title-icon">📦</span>
-          <span>Прогнозируемое количество (шт.)</span>
+          <span>Прогнозируемое количество</span>
         </template>
         <template #content>
           <div v-if="loading">Загрузка...</div>
@@ -66,7 +66,7 @@
             <Column field="client" header="Клиент"></Column>
             <Column field="price" header="Общая сумма">
               <template #body="{data}">
-                {{ data.price.toLocaleString('ru-RU') }} тыс. руб.
+                {{ (data.price * 1000).toLocaleString('ru-RU') }} руб.
               </template>
             </Column>
           </DataTable>
@@ -143,7 +143,7 @@ const revenueChartOptions = computed(() => ({
       ...chartOptions.value.scales.y,
       title: {
         display: true,
-        text: 'Тыс. руб.',
+        text: 'Руб.',
         font: { family: "'Inter', sans-serif" }
       }
     }
@@ -153,7 +153,7 @@ const revenueChartOptions = computed(() => ({
     tooltip: {
       ...chartOptions.value.plugins.tooltip,
       callbacks: {
-        label: (context) => `${context.dataset.label}: ${context.raw.toLocaleString('ru-RU')} тыс. руб.`
+        label: (context) => `${context.dataset.label}: ${(context.raw * 1000).toLocaleString('ru-RU')} руб.`
       }
     }
   }
