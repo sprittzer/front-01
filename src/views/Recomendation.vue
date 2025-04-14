@@ -13,8 +13,8 @@
             <h2 class="m-0">Рекомендателная система</h2>
             <h4>Введите ID клиента и вам предложат топ товаров для него:</h4>
             <div style="display: flex;">
-                <InputNumber v-model="value2" inputId="withoutgrouping" :useGrouping="false" fluid />
-                <Button style="margin-left: 5px;">Найти</Button>
+                <InputNumber v-model="inputID" inputId="withoutgrouping" :useGrouping="false" fluid />
+                <Button @click="getPredict" style="margin-left: 5px;">Найти</Button>
             </div>
             
           </div>
@@ -63,18 +63,42 @@
   import InputText from 'primevue/inputtext';
   import InputNumber from 'primevue/inputnumber';
   import Button from 'primevue/button';
+  import axios from 'axios';
   
   // Data to display
   const productsData = ref([]);
+  const inputID = ref(null);
+
+  // https://quartzcrystal.pythonanywhere.com/recommendation/?client_id=156638&top_n=10
+  async function getPredict() {
+  try {
+    if (!inputID.value) {
+      // Handle case when no ID is entered
+      return;
+    }
+    
+    const { data } = await axios.get(
+      `https://quartzcrystal.pythonanywhere.com/recommendation/?client_id=${inputID.value}&top_n=10`
+    );
+    
+    // Ensure data is an array before assigning
+    if (Array.isArray(data)) {
+      products.value = data;
+    } else {
+      console.error('API did not return an array:', data);
+      products.value = []; // Reset to empty array
+    }
+  } catch (error) {
+    console.error('Error fetching recommendations:', error);
+    products.value = []; // Reset on error
+  }
+}
+
+  
   
   // Reactive references
   const products = ref([]);
   const globalFilter = ref('');
-  
-  // Load data when component is mounted
-  onMounted(() => {
-    products.value = productsData;
-  });
   </script>
   
   <style scoped>
