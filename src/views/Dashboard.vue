@@ -2,16 +2,22 @@
   <div class="dashboard">
     <h1 class="dashboard-title">Прогнозирование продаж CUDO</h1>
 
-    
     <div class="filters-container">
       <div class="filters-wrapper">
         <CategoryFilter @category-selected="onCategorySelected" :categories="categories" />
         <DateRangePicker @date-range-selected="onDateRangeSelected" />
+        <Button 
+          label="Выгрузить данные" 
+          icon="pi pi-download" 
+          class="download-btn"
+          @click="downloadData"
+          :loading="downloadLoading"
+        />
       </div>
     </div>
 
-    <!-- Распределение по категориям (только для "Все категории") -->
-    <div v-if="!selectedCategory" class="single-chart-row">
+    <!-- Распределение по категориям (две диаграммы в строке) -->
+    <div v-if="!selectedCategory" class="distribution-row">
       <Card class="glass-card">
         <template #title>
           <span>Распределение выручки по категориям</span>
@@ -22,9 +28,6 @@
           <Chart v-else type="pie" :data="revenueRatioData" :options="ratioChartOptions" class="ratio-chart" />
         </template>
       </Card>
-    </div>
-
-    <div v-if="!selectedCategory" class="single-chart-row">
       <Card class="glass-card">
         <template #title>
           <span>Распределение числа продаж по категориям</span>
@@ -37,13 +40,13 @@
       </Card>
     </div>
 
-    <!-- Feature Importance (только для "Все категории") -->
-    <div v-if="!selectedCategory" class="single-chart-row">
+    <!-- Feature Importance (каждый график в отдельной строке) -->
+    <div v-if="!selectedCategory" class="feature-importance-row">
       <FeatureImportanceDashboard />
     </div>
 
     <!-- График выручки -->
-    <div class="single-chart-row">
+    <div class="main-chart-row">
       <Card class="glass-card">
         <template #title>
           <span class="card-title-icon">💰</span>
@@ -58,7 +61,7 @@
     </div>
 
     <!-- График количества -->
-    <div class="single-chart-row">
+    <div class="main-chart-row">
       <Card class="glass-card">
         <template #title>
           <span class="card-title-icon">📊</span>
@@ -78,10 +81,14 @@
 import { ref, onMounted, watch, computed } from 'vue'
 import Chart from 'primevue/chart'
 import Card from 'primevue/card'
+import Button from 'primevue/button'
 import CategoryFilter from '../components/CategoryFilter.vue'
 import DateRangePicker from '../components/DateRangePicker.vue'
 import FeatureImportanceDashboard from '@/components/FeatureImportanceRadar.vue'
 import axios from 'axios'
+import { useToast } from 'primevue/usetoast'
+
+const toast = useToast()
 
 // Состояния данных
 const loading = ref(false)
@@ -91,6 +98,7 @@ const chartKey = ref(0)
 const ratioLoading = ref(false)
 const ratioError = ref('')
 const ratioData = ref(null)
+const downloadLoading = ref(false)
 
 // Фильтры
 const selectedCategory = ref(null)
@@ -272,6 +280,48 @@ const onDateRangeSelected = (dates) => {
   console.log('Выбран диапазон:', dates)
 }
 
+// Функция для выгрузки данных
+const downloadData = async () => {
+  downloadLoading.value = true;
+  try {
+    let url = 'https://quartzcrystal.pythonanywhere.com/file/';
+    if (selectedCategory.value) {
+      url += `?category=${selectedCategory.value}`;
+    }
+    
+    const response = await axios.get(url);
+    
+    if (response.data?.url) {
+      const link = document.createElement('a');
+      link.href = response.data.url;
+      link.target = '_blank';
+      link.download = `forecast_${selectedCategory.value || 'all'}_${new Date().toISOString().slice(0,10)}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      toast.add({
+        severity: 'success',
+        summary: 'Успешно',
+        detail: 'Файл готов к скачиванию',
+        life: 3000
+      });
+    } else {
+      throw new Error('Не получили URL для скачивания');
+    }
+  } catch (error) {
+    console.error('Ошибка при выгрузке данных:', error);
+    toast.add({
+      severity: 'error',
+      summary: 'Ошибка',
+      detail: 'Не удалось выгрузить данные',
+      life: 3000
+    });
+  } finally {
+    downloadLoading.value = false;
+  }
+};
+
 // Загрузка данных
 const fetchSalesData = async () => {
   loading.value = true
@@ -302,9 +352,8 @@ const fetchSalesData = async () => {
       ]
     }
     
-    chartKey.value++ // Принудительное обновление графиков
+    chartKey.value++
     
-    // Если выбраны все категории, загружаем распределение
     if (!selectedCategory.value) {
       await fetchRatioData()
     }
@@ -413,7 +462,21 @@ onMounted(() => {
   text-align: center;
 }
 
-.single-chart-row {
+/* Стиль для строки с круговыми диаграммами распределения */
+.distribution-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+/* Стиль для отдельных строк с графиками приоритетности */
+.feature-importance-row {
+  margin-bottom: 2rem;
+}
+
+/* Стиль для основных графиков (выручка и количество) */
+.main-chart-row {
   margin-bottom: 2rem;
 }
 
@@ -438,6 +501,23 @@ onMounted(() => {
   margin-right: 0.75rem;
 }
 
+/* Кнопка выгрузки */
+.download-btn {
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+button.p-button.download-btn:hover {
+  background: #4dc151 !important;
+  border: none !important;
+}
 /* Styles for filters */
 .filters-container {
   margin-bottom: 2rem;
@@ -450,8 +530,26 @@ onMounted(() => {
 
 .filters-wrapper {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
   padding: 1rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 768px) {
+  .distribution-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .filters-wrapper {
+    flex-direction: column;
+  }
+  
+  .download-btn {
+    width: 100%;
+    justify-content: center;
+  }
 }
 </style>
