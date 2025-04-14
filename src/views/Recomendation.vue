@@ -11,7 +11,7 @@
         <template #header>
           <div class="flex justify-content-between">
             <h2 class="m-0">Рекомендателная система</h2>
-            <h4>Введите ID клиента и вам предложат топ товаров для него:</h4>
+            <h4>Введите ID клиента и вам предложат топ-10 товаров для него:</h4>
             <div style="display: flex;">
                 <InputNumber v-model="inputID" inputId="withoutgrouping" :useGrouping="false" fluid />
                 <Button @click="getPredict" style="margin-left: 5px;">Найти</Button>
