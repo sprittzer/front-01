@@ -12,6 +12,7 @@
     "@primeuix/themes": "^1.0.0",
     "axios": "^1.8.4",
     "chart.js": "^4.4.1",
+    "papaparse": "^5.5.2",
     "pinia": "^3.0.1",
     "primeicons": "^7.0.0",
     "primevue": "^4.3.3",

@@ -1,0 +1,11 @@
+Feature,Original_Value,result_value
+price,0.815402,1.000000
+final_price_log,0.242575,0.357700
+region,0.227619,0.340931
+key_rate,0.123611,0.224309
+quantity_rolling_3,0.053788,0.146018
+group,0.039227,0.129691
+month_cos,0.024199,0.112840
+quantity_lag_12,0.019218,0.107255
+quantity_lag_1,0.017225,0.105021
+category,0.012747,0.100000

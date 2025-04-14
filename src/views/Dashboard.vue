@@ -2,6 +2,7 @@
   <div class="dashboard">
     <h1 class="dashboard-title">Прогнозирование продаж CUDO</h1>
 
+    
     <div class="filters-container">
       <div class="filters-wrapper">
         <CategoryFilter @category-selected="onCategorySelected" :categories="categories" />
@@ -9,8 +10,8 @@
       </div>
     </div>
 
-    <!-- Круговая диаграмма по категориям (только для "Все категории") -->
-    <div v-if="!selectedCategory" class="charts-grid">
+    <!-- Распределение по категориям (только для "Все категории") -->
+    <div v-if="!selectedCategory" class="single-chart-row">
       <Card class="glass-card">
         <template #title>
           <span>Распределение выручки по категориям</span>
@@ -21,7 +22,9 @@
           <Chart v-else type="pie" :data="revenueRatioData" :options="ratioChartOptions" class="ratio-chart" />
         </template>
       </Card>
+    </div>
 
+    <div v-if="!selectedCategory" class="single-chart-row">
       <Card class="glass-card">
         <template #title>
           <span>Распределение числа продаж по категориям</span>
@@ -34,8 +37,13 @@
       </Card>
     </div>
 
+    <!-- Feature Importance (только для "Все категории") -->
+    <div v-if="!selectedCategory" class="single-chart-row">
+      <FeatureImportanceDashboard />
+    </div>
+
     <!-- График выручки -->
-    <div class="main-chart-container">
+    <div class="single-chart-row">
       <Card class="glass-card">
         <template #title>
           <span class="card-title-icon">💰</span>
@@ -50,7 +58,7 @@
     </div>
 
     <!-- График количества -->
-    <div class="main-chart-container">
+    <div class="single-chart-row">
       <Card class="glass-card">
         <template #title>
           <span class="card-title-icon">📊</span>
@@ -72,6 +80,7 @@ import Chart from 'primevue/chart'
 import Card from 'primevue/card'
 import CategoryFilter from '../components/CategoryFilter.vue'
 import DateRangePicker from '../components/DateRangePicker.vue'
+import FeatureImportanceDashboard from '@/components/FeatureImportanceRadar.vue'
 import axios from 'axios'
 
 // Состояния данных
@@ -115,7 +124,7 @@ const chartOptions = ref({
 const ratioChartOptions = computed(() => ({
   responsive: true,
   maintainAspectRatio: false,
-  cutout: '60%', // Делаем диаграмму более "тонкой"
+  cutout: '60%',
   plugins: {
     legend: {
       position: 'right',
@@ -126,8 +135,8 @@ const ratioChartOptions = computed(() => ({
         }, 
         color: '#5A5A5A',
         padding: 20,
-        usePointStyle: true, // Используем точки вместо прямоугольников
-        boxWidth: 10 // Ширина квадратика легенды
+        usePointStyle: true,
+        boxWidth: 10
       }
     },
     tooltip: {
@@ -144,12 +153,11 @@ const ratioChartOptions = computed(() => ({
         }
       }
     },
-    // Добавляем плагин для отображения процентов внутри диаграммы
     datalabels: {
       formatter: (value, context) => {
         const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
         const percentage = Math.round((value / total) * 100);
-        return percentage > 5 ? `${percentage}%` : ''; // Показываем только если больше 5%
+        return percentage > 5 ? `${percentage}%` : '';
       },
       color: '#fff',
       font: {
@@ -405,14 +413,7 @@ onMounted(() => {
   text-align: center;
 }
 
-.main-chart-container {
-  margin-bottom: 2rem;
-}
-
-.charts-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-  gap: 1.5rem;
+.single-chart-row {
   margin-bottom: 2rem;
 }
 
@@ -437,14 +438,6 @@ onMounted(() => {
   margin-right: 0.75rem;
 }
 
-.p-datatable {
-  font-size: 0.9rem;
-}
-
-.p-datatable-sm .p-datatable-tbody > tr > td {
-  padding: 0.5rem;
-}
-
 /* Styles for filters */
 .filters-container {
   margin-bottom: 2rem;
@@ -460,34 +453,5 @@ onMounted(() => {
   justify-content: space-around;
   align-items: center;
   padding: 1rem;
-}
-
-.filter-card {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(10px);
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  padding: 2rem;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-}
-
-.filter-title-icon {
-  margin-right: 0.75rem;
-  color: #5A5A5A;
-}
-
-.filters {
-  display: flex;
-  gap: 20px;
-}
-
-.filter-item {
-  flex: 1;
-}
-
-.filter-item label {
-  margin-bottom: 0.5rem;
-  font-weight: 500;
-  color: #333;
 }
 </style>

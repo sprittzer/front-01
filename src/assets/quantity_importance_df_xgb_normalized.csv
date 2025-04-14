@@ -1,0 +1,11 @@
+Feature,Original_Value,result_value
+key_rate,0.521764,1.000000
+price,0.209092,0.456089
+region,0.107133,0.278726
+fulfilled,0.063615,0.203024
+quantity_rolling_3,0.032728,0.149293
+final_price_log,0.020623,0.128237
+year,0.006833,0.104247
+quantity_lag_1,0.006763,0.104126
+month_cos,0.004592,0.100349
+Округ,0.004391,0.100000
