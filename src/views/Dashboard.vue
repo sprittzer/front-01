@@ -4,21 +4,36 @@
     <FileUpload />
 
     <div class="filters">
-      <CategoryFilter @category-selected="onCategorySelected" />
+      <CategoryFilter @category-selected="onCategorySelected" :categories="categories" />
       <DateRangePicker @date-range-selected="onDateRangeSelected" />
     </div>
 
-    <!-- Основной график прогнозов -->
+    <!-- График выручки -->
     <div class="main-chart-container">
       <Card class="glass-card">
         <template #title>
-          <span class="card-title-icon">📊</span>
-          <span>Фактические и прогнозируемые продажи</span>
+          <span class="card-title-icon">💰</span>
+          <span>Прогнозируемая выручка</span>
         </template>
         <template #content>
           <div v-if="loading">Загрузка...</div>
           <div v-else-if="errorMessage">{{ errorMessage }}</div>
-          <Chart v-else type="line" :data="salesChartData" :options="salesChartOptions" class="main-chart" />
+          <Chart v-else type="line" :data="revenueChartData" :options="chartOptions" class="main-chart" />
+        </template>
+      </Card>
+    </div>
+
+    <!-- График количества -->
+    <div class="main-chart-container">
+      <Card class="glass-card">
+        <template #title>
+          <span class="card-title-icon">📦</span>
+          <span>Прогнозируемое количество</span>
+        </template>
+        <template #content>
+          <div v-if="loading">Загрузка...</div>
+          <div v-else-if="errorMessage">{{ errorMessage }}</div>
+          <Chart v-else type="line" :data="quantityChartData" :options="chartOptions" class="main-chart" />
         </template>
       </Card>
     </div>
@@ -26,7 +41,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import Chart from 'primevue/chart'
 import Card from 'primevue/card'
 import FileUpload from '../components/FileUpload.vue'
@@ -36,13 +51,14 @@ import axios from 'axios'
 
 // Filters
 const selectedCategory = ref('')
-const startDate = ref('2024-08-01') // Default start date
-const endDate = ref('2024-11-15') // Default end date
-const categories = ref([]) // Categories from API
+const startDate = ref('2024-08-01')
+const endDate = ref('2024-11-15')
+const categories = ref([])
 
 // Chart data and options
-const salesChartData = ref({})
-const salesChartOptions = ref({
+const revenueChartData = ref({})
+const quantityChartData = ref({})
+const chartOptions = ref({
   responsive: true,
   maintainAspectRatio: false,
   plugins: {
@@ -77,7 +93,7 @@ const salesChartOptions = ref({
     y: {
       title: {
         display: true,
-        text: 'Объем продаж, тыс. руб.',
+        text: 'Значение',
         font: {
           family: "'Inter', sans-serif"
         }
@@ -101,13 +117,11 @@ const errorMessage = ref('')
 // Filter event handlers
 const onCategorySelected = (category) => {
   selectedCategory.value = category
-  fetchSalesData()
 }
 
 const onDateRangeSelected = (dates) => {
   startDate.value = dates.start
   endDate.value = dates.end
-  fetchSalesData()
 }
 
 // Fetch data from API
@@ -115,36 +129,34 @@ const fetchSalesData = async () => {
   loading.value = true
   errorMessage.value = ''
   try {
-    let url = 'https://quartzcrystal.pythonanywhere.com/forecast/?' // Базовый URL API
+    let url = 'https://quartzcrystal.pythonanywhere.com/forecast/?'
     if (selectedCategory.value) {
-      url += `category=${selectedCategory.value}&` // Добавляем параметр категории, если выбрана
+      url += `category=${selectedCategory.value}&`
     }
-    url += `start=${startDate.value}&end=${endDate.value}` // Добавляем параметры start и end
+    url += `start=${startDate.value}&end=${endDate.value}`
 
     const response = await axios.get(url)
+    console.log('API Response:', response) // Печатаем весь ответ в консоль
     const apiData = response.data
 
-    // Извлекаем данные из ответа API
-    const revenueData = apiData.revenue
-    const quantityData = apiData.quantity
+    // Charts
+    const labels = apiData.revenue.map(item => item.date)
 
-    // Преобразуем данные для Chart.js
-    const labels = revenueData.map(item => item.date)
-
-    salesChartData.value = {
+    // Revenue chart
+    revenueChartData.value = {
       labels: labels,
       datasets: [
         {
           label: 'Ожидаемая выручка',
-          data: revenueData.map(item => item.expected),
+          data: apiData.revenue.map(item => item.expected),
           borderColor: '#29B6F6',
           backgroundColor: 'rgba(41, 182, 246, 0.1)',
           tension: 0.3,
           borderWidth: 2
         },
         {
-          label: 'Нижняя граница выручки',
-          data: revenueData.map(item => item.lower),
+          label: 'Нижняя граница',
+          data: apiData.revenue.map(item => item.lower),
           borderColor: 'rgba(41, 182, 246, 0.5)',
           backgroundColor: 'rgba(41, 182, 246, 0.05)',
           borderDash: [5, 5],
@@ -152,25 +164,32 @@ const fetchSalesData = async () => {
           borderWidth: 2
         },
         {
-          label: 'Верхняя граница выручки',
-          data: revenueData.map(item => item.upper),
+          label: 'Верхняя граница',
+          data: apiData.revenue.map(item => item.upper),
           borderColor: 'rgba(41, 182, 246, 0.5)',
           backgroundColor: 'rgba(41, 182, 246, 0.05)',
           borderDash: [5, 5],
           tension: 0.3,
           borderWidth: 2
-        },
+        }
+      ]
+    }
+
+    // Quantity chart
+    quantityChartData.value = {
+      labels: labels,
+      datasets: [
         {
           label: 'Ожидаемое количество',
-          data: quantityData.map(item => item.expected),
+          data: apiData.quantity.map(item => item.expected),
           borderColor: '#7E57C2',
           backgroundColor: 'rgba(126, 87, 194, 0.1)',
           tension: 0.3,
           borderWidth: 2
         },
         {
-          label: 'Нижняя граница количества',
-          data: quantityData.map(item => item.lower),
+          label: 'Нижняя граница',
+          data: apiData.quantity.map(item => item.lower),
           borderColor: 'rgba(126, 87, 194, 0.5)',
           backgroundColor: 'rgba(126, 87, 194, 0.05)',
           borderDash: [5, 5],
@@ -178,8 +197,8 @@ const fetchSalesData = async () => {
           borderWidth: 2
         },
         {
-          label: 'Верхняя граница количества',
-          data: quantityData.map(item => item.upper),
+          label: 'Верхняя граница',
+          data: apiData.quantity.map(item => item.upper),
           borderColor: 'rgba(126, 87, 194, 0.5)',
           backgroundColor: 'rgba(126, 87, 194, 0.05)',
           borderDash: [5, 5],
@@ -200,12 +219,23 @@ const fetchSalesData = async () => {
 const fetchCategories = async () => {
   try {
     const response = await axios.get('https://quartzcrystal.pythonanywhere.com/categories/')
+    console.log('Categories Response:', response)
     categories.value = response.data
   } catch (error) {
     console.error('Ошибка при получении категорий:', error)
     errorMessage.value = 'Ошибка при получении категорий: ' + error.message
   }
 }
+
+// Watchers for filters
+watch([selectedCategory, startDate, endDate], () => {
+  console.log('Filters changed:', {
+    selectedCategory: selectedCategory.value,
+    startDate: startDate.value,
+    endDate: endDate.value
+  })
+  fetchSalesData()
+})
 
 // Initial data fetch
 onMounted(() => {
