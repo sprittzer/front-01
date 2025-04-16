@@ -334,23 +334,8 @@ const fetchSalesData = async () => {
     
     const labels = data.revenue.map(item => item.date)
     
-    revenueChartData.value = {
-      labels,
-      datasets: [
-        createDataset('Ожидаемая выручка', data.revenue, 'expected', '#29B6F6'),
-        createDataset('Нижняя граница', data.revenue, 'lower', 'rgba(41, 182, 246, 0.5)', true),
-        createDataset('Верхняя граница', data.revenue, 'upper', 'rgba(41, 182, 246, 0.5)', true)
-      ]
-    }
-    
-    quantityChartData.value = {
-      labels,
-      datasets: [
-        createDataset('Ожидаемое количество', data.quantity, 'expected', '#7E57C2'),
-        createDataset('Нижняя граница', data.quantity, 'lower', 'rgba(126, 87, 194, 0.5)', true),
-        createDataset('Верхняя граница', data.quantity, 'upper', 'rgba(126, 87, 194, 0.5)', true)
-      ]
-    }
+    revenueChartData.value = prepareChartData(data.revenue, 'Выручка', '#29B6F6');
+    quantityChartData.value = prepareChartData(data.quantity, 'Количество', '#7E57C2', true);
     
     chartKey.value++
     
@@ -398,15 +383,95 @@ const generateColors = (count) => {
   return colors
 }
 
-const createDataset = (label, data, key, color, dashed = false) => ({
-  label,
-  data: data.map(item => item[key]),
-  borderColor: color,
-  backgroundColor: color.replace(')', ', 0.1)').replace('rgb', 'rgba'),
-  borderDash: dashed ? [5, 5] : undefined,
-  tension: 0.3,
-  borderWidth: 2
-})
+const createDataset = (label, data, key, color, dashed = false, isForecast = false) => {
+  // Определяем точку разделения (июнь 2024)
+  const splitDate = '2024-06-01';
+  
+  // Разделяем данные на фактические и прогнозируемые
+  const actualData = [];
+  const forecastData = [];
+  const labels = data.map(item => item.date);
+  
+  data.forEach((item, index) => {
+    if (item.date < splitDate) {
+      actualData.push(item[key]);
+      forecastData.push(null); // null чтобы не соединять точки
+    } else {
+      actualData.push(null);
+      forecastData.push(item[key]);
+    }
+  });
+  
+  // Если это не прогноз, возвращаем обычный датасет
+  if (!isForecast) {
+    return {
+      label,
+      data: data.map(item => item[key]),
+      borderColor: color,
+      backgroundColor: color.replace(')', ', 0.1)').replace('rgb', 'rgba'),
+      borderDash: dashed ? [5, 5] : undefined,
+      tension: 0.3,
+      borderWidth: 2
+    };
+  }
+  
+  // Для прогноза возвращаем два датасета - один для фактических данных, другой для прогноза
+  return [
+    {
+      label: `${label} (Факт)`,
+      data: actualData,
+      borderColor: color,
+      backgroundColor: 'transparent',
+      borderDash: dashed ? [5, 5] : undefined,
+      tension: 0.3,
+      borderWidth: 2,
+      segment: {
+        borderColor: ctx => ctx.p0.parsed.y !== null ? color : 'transparent'
+      }
+    },
+    {
+      label: `${label} (Прогноз)`,
+      data: forecastData,
+      borderColor: '#FF6B6B', // Красный цвет для прогноза
+      backgroundColor: 'transparent',
+      borderDash: dashed ? [5, 5] : undefined,
+      tension: 0.3,
+      borderWidth: 2,
+      segment: {
+        borderColor: ctx => ctx.p0.parsed.y !== null ? '#FF6B6B' : 'transparent'
+      }
+    }
+  ];
+};
+
+const prepareChartData = (data, label, color, isQuantity = false) => {
+  const labels = data.map(item => item.date);
+  
+  // Основной датасет с разделением на факт и прогноз
+  const mainDataset = createDataset(label, data, 'expected', color, false, true);
+  
+  // Границы (без разделения на факт/прогноз)
+  const lowerDataset = createDataset(
+    `${label} - нижняя граница`, 
+    data, 
+    'lower', 
+    isQuantity ? 'rgba(126, 87, 194, 0.5)' : 'rgba(41, 182, 246, 0.5)', 
+    true
+  );
+  
+  const upperDataset = createDataset(
+    `${label} - верхняя граница`, 
+    data, 
+    'upper', 
+    isQuantity ? 'rgba(126, 87, 194, 0.5)' : 'rgba(41, 182, 246, 0.5)', 
+    true
+  );
+  
+  return {
+    labels,
+    datasets: [...mainDataset, lowerDataset, upperDataset]
+  };
+};
 
 // Загрузка категорий
 const fetchCategories = async () => {
